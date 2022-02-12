@@ -1,0 +1,16 @@
+{
+  "name": "room",
+  "dimensions": {
+    "x": 3,
+    "y": 3  
+  },
+  "tiles": [
+    { "texture": 0, "effect": 0 }, { "texture": 0, "effect": 0 }, { "texture": 1, "effect": 1 },
+    { "texture": 0, "effect": 0 }, { "texture": 1, "effect": 1 }, { "texture": 1, "effect": 1 },
+    { "texture": 0, "effect": 0 }, { "texture": 0, "effect": 0 }, { "texture": 0, "effect": 0 }
+  ],
+  "playerSpawn": {
+    "x": 1,
+    "y": 1
+  }
+}

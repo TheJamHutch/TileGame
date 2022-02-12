@@ -1,0 +1,19 @@
+{
+  "name": "tilegame",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "jquery": "^3.6.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.178",
+    "sass": "^1.45.0",
+    "typescript": "^4.4.4",
+    "vite": "^2.7.2"
+  }
+}

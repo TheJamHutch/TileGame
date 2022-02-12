@@ -1,0 +1,11 @@
+{
+  "name": "overworld",
+  "dimensions": {
+    "x": 30,
+    "y": 30  
+  },
+  "playerSpawn": {
+    "x": 0,
+    "y": 0
+  }
+}

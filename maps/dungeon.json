@@ -1,0 +1,11 @@
+{
+  "name": "dungeon",
+  "dimensions": {
+    "x": 18,
+    "y": 18  
+  },
+  "playerSpawn": {
+    "x": 1,
+    "y": 1
+  }
+}

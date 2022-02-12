@@ -1,0 +1,30 @@
+{
+  "name": "town",
+  "dimensions": {
+    "x": 9,
+    "y": 9  
+  },
+  "tiles": [
+    { "texture": 0, "effect": 0 }, { "texture": 0, "effect": 0 }, { "texture": 1, "effect": 1 },
+    { "texture": 0, "effect": 0 }, { "texture": 1, "effect": 1 }, { "texture": 1, "effect": 1 },
+    { "texture": 0, "effect": 0 }, { "texture": 0, "effect": 0 }, { "texture": 0, "effect": 0 },
+    { "texture": 0, "effect": 0 }, { "texture": 0, "effect": 0 }, { "texture": 1, "effect": 1 },
+    { "texture": 0, "effect": 0 }, { "texture": 1, "effect": 1 }, { "texture": 1, "effect": 1 },
+    { "texture": 0, "effect": 0 }, { "texture": 0, "effect": 0 }, { "texture": 1, "effect": 1 },
+    { "texture": 0, "effect": 0 }, { "texture": 1, "effect": 1 }, { "texture": 1, "effect": 1 },
+    { "texture": 0, "effect": 0 }, { "texture": 0, "effect": 0 }, { "texture": 1, "effect": 1 },
+    { "texture": 0, "effect": 0 }, { "texture": 1, "effect": 1 }, { "texture": 1, "effect": 1 },
+    { "texture": 0, "effect": 0 }, { "texture": 0, "effect": 0 }, { "texture": 1, "effect": 1 },
+    { "texture": 0, "effect": 0 }, { "texture": 1, "effect": 1 }, { "texture": 0, "effect": 0 },
+    { "texture": 0, "effect": 0 }, { "texture": 0, "effect": 0 }, { "texture": 1, "effect": 1 },
+    { "texture": 0, "effect": 0 }, { "texture": 0, "effect": 0 }, { "texture": 1, "effect": 1 },
+    { "texture": 0, "effect": 0 }, { "texture": 0, "effect": 0 }, { "texture": 1, "effect": 1 },
+    { "texture": 0, "effect": 0 }, { "texture": 1, "effect": 1 }, { "texture": 1, "effect": 1 },
+    { "texture": 0, "effect": 0 }, { "texture": 0, "effect": 0 }, { "texture": 1, "effect": 1 },
+    { "texture": 0, "effect": 0 }, { "texture": 1, "effect": 1 }, { "texture": 1, "effect": 1 }
+  ],
+  "playerSpawn": {
+    "x": 200,
+    "y": 100
+  }
+}

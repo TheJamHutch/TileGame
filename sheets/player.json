@@ -1,0 +1,16 @@
+{
+    "name": "player",
+    "dimensions": {
+      "x": 5,
+      "y": 5
+    },
+    "clipSize": {
+      "x": 32,
+      "y": 32
+    },
+    "animations": {
+      "walkSouth": [
+        0, 1, 2, 3, 4
+      ]
+    }
+}
