@@ -3,6 +3,8 @@ import { Tilemap } from './tilemap';
 import { Camera } from './camera'; 
 import { Player } from './player';
 import { Render } from './render';
+import { Events } from './events';
+import { Global } from './global';
 import * as _ from 'lodash';
 
 import overworldMapJson from '../maps/overworld.json';
@@ -32,6 +34,7 @@ export class Game {
   maps: any;
   sheets: any;
   context: CanvasRenderingContext2D;
+  events: any;
 
   get cameraPos(){
     return {
@@ -51,12 +54,9 @@ export class Game {
     this.context = context;
     this.resolution = config.resolution;
 
-    this.init(config);
-  }
+    this.events = Global.eventsRef;
 
-  start(){
-    // @TODO: Make init return a promise and await from here.
-    this.update();
+    this.init(config);
   }
 
   private init(config: { resolution: Vector, initMap: string }){
@@ -78,12 +78,20 @@ export class Game {
     // Create game objects
     this.activeMap = this.maps[config.initMap];
     
-    this.camera = this.camera = new Camera(this.resolution, this.activeMap.tilemap.resolution, this.activeMap.playerSpawn);
+    this.camera = new Camera(this.resolution, this.activeMap.tilemap.resolution, this.activeMap.playerSpawn);
     this.player = new Player(this.activeMap.playerSpawn, { x: 32, y: 32 });
 
     // Load spritesheets
     this.sheets = {};
     this.sheets[this.player.id] = createSpritesheet(this.textures['player'], playerSheetJson);
+
+    this.events.register('mapChange', (mapName: string) => this.changeMap(mapName));
+
+    // @TODO: Remove
+    this.events.register('showPos', (context: any) => {
+      console.log('World:', this.player.world);
+      console.log('View:', this.player.view);
+    })
   }
 
   private render(){
@@ -100,8 +108,10 @@ export class Game {
     //context.fillText(`FPS: ${this.timer.fps}`, 5, 40);
   }
 
-  private update(){
-    this.camera.update();
+  update(){
+    this.events.poll();
+
+    this.camera.update(this.player);
     this.player.update(this.camera, this.activeMap.tilemap.resolution, this.activeMap.tilemap.viewTiles);
     this.render();
   }
@@ -122,11 +132,11 @@ export class Game {
     return gameMap
   }
   
-  changeMap(mapId: string): void {
-    if (this.maps[mapId]){
-      this.activeMap = this.maps[mapId];
+  changeMap(mapName: string): void {
+    if (this.maps[mapName]){
+      this.activeMap = this.maps[mapName];
     } else {
-      console.warn(`Failed to change map. Map: ${mapId}.json not found`);
+      console.warn(`Failed to change map. Map: ${mapName}.json not found`);
       return;
     }
   
@@ -147,20 +157,19 @@ export class Game {
   onKeyDown(key: string){
     switch(key){
       case 'w':
-        this.camera.velocity.y = -1;
         this.player.velocity.y = -1;
         break;
       case 's':
-        this.camera.velocity.y = 1;
         this.player.velocity.y = 1;
         break;
       case 'a':
-        this.camera.velocity.x = -1;
         this.player.velocity.x = -1;
         break;
       case 'd':
-        this.camera.velocity.x = 1;
         this.player.velocity.x = 1;
+        break;
+      case 'x':
+        this.events.raise('showPos', null);
         break;
     }
   }
@@ -169,12 +178,10 @@ export class Game {
     switch(key){
       case 'w':
       case 's':
-        this.camera.velocity.y = 0;
         this.player.velocity.y = 0;
         break;
       case 'a':
       case 'd':
-        this.camera.velocity.x = 0;
         this.player.velocity.x = 0;
         break;
     }
