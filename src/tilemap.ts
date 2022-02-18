@@ -87,8 +87,8 @@ export class Tilemap{
       y: Math.floor(camera.world.y / this.tileSize)
     };
     const inView = {
-      x: camera.resolution.x / this.tileSize,
-      y: camera.resolution.y / this.tileSize
+      x: camera.view.x / this.tileSize,
+      y: camera.view.y / this.tileSize
     };
     /*
     const offset = {

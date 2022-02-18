@@ -11,7 +11,6 @@ export namespace Render {
     image: HTMLImageElement
   };
   
-  // @TODO: This will only work when running locally. Images for Bitmaps need to be obtained from server.
   export function loadBitmap(path: string): Bitmap {
     const image = new Image();
     image.src = path;

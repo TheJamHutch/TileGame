@@ -1,29 +1,9 @@
 import './style.scss'
 import * as jquery from 'jquery';
-
-import { Game } from './src/game';
+import { App } from './src/app';
 
 window.$ = window.jquery = jquery;
-
 let dom = {};
-
-function mainLoop(game){
-
-  function update(game){
-
-    // Update debug view
-    dom.debug.cameraPos.innerHTML = `Camera: ( x: ${game.cameraPos.x}, y: ${game.cameraPos.y} )`;
-    dom.debug.playerPos.innerHTML = `Player: ( x: ${game.playerPos.x}, y: ${game.playerPos.y} )`;
-
-    game.update();
-    
-    requestAnimationFrame(() => {
-      update(game);
-    });
-  }
-
-  update(game);
-}
 
 $(document).on('DOMContentLoaded', () => {
   // Init DOM object
@@ -37,34 +17,28 @@ $(document).on('DOMContentLoaded', () => {
     playerPos: $('#player-pos')[0]
   };
 
-  // Init game config
-  let config = {
-    resolution: { x: 640, y: 480 },
-    initMap: 'overworld'
-  };
-
+  // @TODO: This should not be where the resolution is set.
   // Set canvas resolution
-  dom.canvas.width = config.resolution.x;
-  dom.canvas.height = config.resolution.y;
+  dom.canvas.width = 640;
+  dom.canvas.height = 480;
 
   // Init context
   const context = dom.canvas.getContext('2d');
   context.font = '16px consolas';
   context.fillStyle = 'black';
 
-  const game = new Game(config, context);
-  game.start();
+  const app = new App();
 
-  // Init events
+  // Bind app events to the corresponding DOM event or element.
   dom.controls.mapSelect.on('change', (e) => {
-    game.changeMap(e.target.value);
-  })
+    app.listeners.onMapSelect(e.target.value);
+  });
   $(document).on('keydown', (e) => {
-    game.onKeyDown(e.key);
+    app.listeners.onKeyDown(e.key);
   });
   $(document).on('keyup', (e) => {
-    game.onKeyUp(e.key);
+    app.listeners.onKeyUp(e.key);
   });
-
-  mainLoop(game);
+  
+  app.start(context);
 });

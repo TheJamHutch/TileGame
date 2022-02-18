@@ -22,25 +22,11 @@ export class Player {
 
   update(camera: Camera, worldBounds: Vector, tilesInView: Tile[]): void {
     
-    /*
-    // Unlock camera
-    if (camera.locked.west && (this.world.x + 16 > 224)){
-      camera.locked.west = false;
-    }
-    else if (camera.locked.east && (this.world.x + 46 < worldBounds.x - 224)){
-      camera.locked.east = false;
-    }
-    if (camera.locked.north && (this.world.y > 164)){
-      camera.locked.north = false;
-    }
-    else if (camera.locked.south && (this.world.y + 46 < worldBounds.y - 164)){
-      camera.locked.south = false;
-    }
   
     // Check world bounds
     if (this.velocity.x < 0 && this.world.x <= 0){
       this.velocity.x = 0;
-    } else if (this.velocity.x > 0 && (this.world.x + this.view.w > worldBounds.x)){
+    } else if (this.velocity.x > 0 && (this.world.x > worldBounds.x)){
       this.velocity.x = 0;
     }
     if (this.velocity.y < 0 && this.world.y <= 0){
@@ -51,13 +37,37 @@ export class Player {
   
     this.world.x += this.velocity.x * this.moveSpeed;
     this.world.y += this.velocity.y * this.moveSpeed;
+
+    /*
+    this.view.x = this.worldToView(this.world, camera).x;
+    this.view.y = this.worldToView(this.world, camera).y;*/
   
     if (camera.locked.west || camera.locked.east){
       this.view.x += this.velocity.x * this.moveSpeed;
     }
     if (camera.locked.north || camera.locked.south){
       this.view.y += this.velocity.y * this.moveSpeed;
-    }*/
+    }
+  }
+
+  private worldToView(world: Vector, camera: Camera): Vector {
+    let view = {} as any;
+
+
+    if (camera.locked.west){
+      view.x = world.x - (camera.world.x % 320);
+    } else {
+      view.x = 320;
+    }
+
+    view.y = world.y - (camera.world.y % 240);
+    /*
+    const diff = this.view.x - Math.floor(camera.world.x % (camera.view.x / 2));
+    view.x = (world.x - diff);
+    const diff2 = this.view.y - Math.floor(camera.world.y % (camera.view.y / 2));
+    view.y = (world.y - diff2);*/
+
+    return view;
   }
 
 }
