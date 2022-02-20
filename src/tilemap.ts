@@ -45,6 +45,8 @@ export class Tilemap{
         idx++;
       }
     }
+    // @TODO: Tile array is one tile too short so need to push extra one to it
+    this.tiles.push({ texture: 0, effect: 0, dest: null });
   }
   
   render(context: CanvasRenderingContext2D, textureSheet: Bitmap, camera: Camera): void {
@@ -107,12 +109,13 @@ export class Tilemap{
       for (let x = start.x; x < end.x; x++)
       {
         const c = (y * this.dimensions.x) + x;
-        clip = setClip(this.tiles[c].texture, this.tileSize);
+        const tile = this.tiles[c];
+        clip = setClip(tile.texture, this.tileSize);
         dest.x = (x * this.tileSize) - camera.world.x;
         dest.y = (y * this.tileSize) - camera.world.y;
-        this.tiles[c].dest = dest;
+        tile.dest = dest;
   
-        this.viewTiles.push(this.tiles[c]);
+        this.viewTiles.push(tile);
   
         drawBitmap(context, textureSheet, clip, dest);
       }
