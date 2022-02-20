@@ -45,14 +45,14 @@ export class Camera {
     if (player.velocity.x < 0 && this.world.x <= 0){
       this.locked.west = true;
     }
-    else if (player.velocity.x > 0 && this.world.x + this.view.x > this.worldBounds.x){
+    else if (player.velocity.x > 0 && this.world.x + this.view.x >= global.worldBounds.x - 200){
       this.locked.east = true;
     }
 
     if (player.velocity.y < 0 && this.world.y <= 0){
       this.locked.north = true;
     }
-    else if (player.velocity.y > 0 && this.world.y + this.view.y > this.worldBounds.y - 200){
+    else if (player.velocity.y > 0 && this.world.y + this.view.y >= global.worldBounds.y - 200){
       this.locked.south = true;
     }
 
@@ -61,14 +61,14 @@ export class Camera {
     if (this.locked.west && (player.world.x + player.view.w > (this.view.x / 2))){
       this.locked.west = false;
     }
-    else if (this.locked.east && (player.world.x < this.worldBounds.x - (this.view.x / 2))){
+    else if (this.locked.east && (player.world.x < global.worldBounds.x - (this.view.x / 2))){
       this.locked.east = false;
     }
     
     if (this.locked.north && (player.world.y > (this.view.y / 2))){
       this.locked.north = false;
     }
-    else if (this.locked.south && (player.world.y < this.worldBounds.y - (this.view.y / 2))){
+    else if (this.locked.south && (player.world.y < global.worldBounds.y - (this.view.y / 2))){
       this.locked.south = false;
     }
 
