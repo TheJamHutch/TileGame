@@ -8,7 +8,7 @@
       "x": 32,
       "y": 32
     },
-    "scaleFactor": 2,
+    "scaleFactor": 1,
     "animations": {
       "idleSouth": {
         "speed": 25,

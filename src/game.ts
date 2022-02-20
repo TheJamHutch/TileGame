@@ -1,4 +1,4 @@
-import { Rect, Vector, rect_contains } from './primitives';
+import { Rect, Vector } from './primitives';
 import { Tilemap } from './tilemap';
 import { Camera } from './camera'; 
 import { Player } from './player';
@@ -6,6 +6,7 @@ import { Bitmap, loadBitmap, drawBitmap, drawLine } from './render';
 import { Events } from './events';
 import { global } from './global';
 import { Enemy } from './enemy';
+import { Sprite, SpriteSheet, animateSprite } from './sprites';
 import * as _ from 'lodash';
 
 import overworldMapJson from '../maps/overworld.json';
@@ -14,13 +15,18 @@ import townMapJson from '../maps/town.json';
 import roomMapJson from '../maps/room.json';
 
 import playerSheetJson from '../sheets/player.json';
-import { Sprite, SpriteSheet, animateSprite } from './sprites';
+import slimeSheetJson from '../sheets/slime.json';
 
 type GameMap = {
   id: string,
   tilemap: Tilemap,
-  playerSpawn: Vector
+  playerSpawn: Vector,
+  enemies: any[]
 };
+
+// @TODO: Move to const.ts file?
+const MAX_FRAME_COUNT = 1000;
+const TARGET_FPS = 60;
 
 export class Game {
 
@@ -33,12 +39,11 @@ export class Game {
   sheets: any;
   context: CanvasRenderingContext2D;
   events: any;
-
-  enemy: Enemy;
+  enemies: Enemy[] = [];
 
   frameCount = 0;
   targetFps = 60;
-  fps = 60;
+  fps = TARGET_FPS;
 
   constructor(config: { resolution: Vector, initMap: string }, context: CanvasRenderingContext2D){
     this.context = context;
@@ -68,61 +73,71 @@ export class Game {
 
     this.activeMap = this.maps[config.initMap];
 
+    global.worldBounds = this.activeMap.tilemap.resolution;
+
     // Create game objects
-    
     this.camera = new Camera(this.resolution, this.activeMap.tilemap.resolution, this.activeMap.playerSpawn);
     this.player = new Player(this.activeMap.playerSpawn, { x: 32, y: 32 });
-    this.enemy = new Enemy();
+
+    // Spawn enemies specified in active map
+    const mapEnemies = this.activeMap.enemies.slice(0);
+    for (let enemy of mapEnemies)
+    {
+      this.enemies.push(new Enemy(enemy.archetype, enemy.startPos));
+    }
 
     // Load spritesheets
     this.sheets = {};
     this.sheets[this.player.id] = new SpriteSheet(playerSheetJson);
+    this.sheets[this.enemies[0].id] = new SpriteSheet(slimeSheetJson);
     
     this.events.register('mapChange', (mapName: string) => this.changeMap(mapName));
-  }
-
-  private worldToView(world: Vector): void {
-
-  }
-
-  private entitiesInView(): Enemy[]
-  {
-    let visibleEntities = [];
-
-    if ((this.enemy.world.x + 32 > this.camera.world.x) && 
-        (this.enemy.world.x + 32 < this.camera.world.x + 640) && 
-        (this.enemy.world.y + 32 > this.camera.world.y) && 
-        (this.enemy.world.y + 32 < this.camera.world.y + 480))
-    {
-      visibleEntities.push(this.enemy);
-    }
-
-    return visibleEntities;
   }
 
   update(){
     this.events.poll();
 
+    // Generate collision graph/ model/ map for player
+    let collisionBoxes: Rect[] = [];
+    for (let enemy of this.enemies) {
+      collisionBoxes.push({ x: enemy.world.x, y: enemy.world.y, w: enemy.view.w, h: enemy.view.h });
+    }
+
+    this.player.update(collisionBoxes);
     this.camera.update(this.player);
 
-    this.player.update(this.camera, this.activeMap.tilemap.resolution, this.activeMap.tilemap.viewTiles);
+    // Update player's view positon
+    let view = this.camera.worldToView(this.player.world);
+    this.player.view.x = view.x;
+    this.player.view.y = view.y;
+
     animateSprite(this.player, this.sheets[this.player.id]);
+    
 
-    this.enemy.view.x = this.enemy.world.x - this.camera.world.x;
-    this.enemy.view.y = this.enemy.world.y - this.camera.world.y;
+    // Loop through all entities (player plus any enemies)
+    for (let enemy of this.enemies) {
+      enemy.update();
 
-    this.render(this.entitiesInView());
+      // Update view position
+      let view = this.camera.worldToView(enemy.world);
+      enemy.view.x = view.x;
+      enemy.view.y = view.y;
+
+      animateSprite(enemy, this.sheets[enemy.id]);
+    }
+
+    this.render();
 
     this.frameCount++;
     global.frameCount = this.frameCount;
-    if (this.frameCount >= this.targetFps){
-      this.fps = this.frameCount;
+    if (this.frameCount >= MAX_FRAME_COUNT){
+      this.fps = TARGET_FPS;
       this.frameCount = 0;
       global.frameCount = this.frameCount;
     }
   }
 
-  private render(entities: Enemy[]){
+  private render(){
 
     this.context.fillStyle = 'black';
     this.context.fillRect(0, 0, 640, 480);
@@ -131,13 +146,14 @@ export class Game {
   
     drawBitmap(this.context, this.textures[this.player.id], this.player.clip, this.player.view);
     
-    for (let entity of entities){
+    // @TODO: Don't draw all enemies, only those that are in view
+    for (let entity of this.enemies){
       drawBitmap(this.context, this.textures[entity.id], entity.clip, entity.view);
     }
     
     this.context.fillStyle = 'red';
-    this.context.fillText(`Frame: ${this.frameCount}`, 550, 20);
-    this.context.fillText(`FPS: ${this.fps}`, 550, 40);
+    this.context.fillText(`Frame: ${this.frameCount}`, 540, 20);
+    this.context.fillText(`FPS: ${this.fps}`, 540, 40);
   }
 
   private createMap(rawMap: any): GameMap{
@@ -150,7 +166,8 @@ export class Game {
       playerSpawn: {
         x: rawMap.playerSpawn.x,
         y: rawMap.playerSpawn.y
-      }
+      },
+      enemies: rawMap.enemies
     };
   
     return gameMap;
