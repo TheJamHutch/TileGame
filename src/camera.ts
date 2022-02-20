@@ -1,6 +1,6 @@
 import { Player } from './player';
 import { Vector } from './primitives';
-import { Global } from './global';
+import { global } from './global';
 
 export class Camera {
   world: Vector;
@@ -27,16 +27,8 @@ export class Camera {
       south: (!this.scrollsY), 
       west: (!this.scrollsX || this.world.x <= 0)
     };
-    console.log(`scrollsX: ${this.scrollsX}, scrollsY: ${this.scrollsY}`);
-    
-    console.log('Camera locked:', this.locked);
 
-    Global.eventsRef.register('reload', this.onReload.bind(this));
-
-    Global.eventsRef.register('showPos', () => {
-      console.log(this.locked);
-      
-    })
+    global.eventsRef.register('reload', this.onReload.bind(this));
   }
 
   onReload(){

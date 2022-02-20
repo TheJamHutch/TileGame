@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { Vector, Rect } from './primitives';
 import { Camera } from './camera';
-import { Render } from './render';
+import { Bitmap, loadBitmap, drawBitmap } from './render';
 
 export enum TileSize {
   SMALL = 8,
@@ -47,7 +47,7 @@ export class Tilemap{
     }
   }
   
-  render(context: CanvasRenderingContext2D, textureSheet: Render.Bitmap, camera: Camera): void {
+  render(context: CanvasRenderingContext2D, textureSheet: Bitmap, camera: Camera): void {
   
     function setClip(index: number, tileSize: number): Rect {
   
@@ -114,7 +114,7 @@ export class Tilemap{
   
         this.viewTiles.push(this.tiles[c]);
   
-        Render.drawBitmap(context, textureSheet, clip, dest);
+        drawBitmap(context, textureSheet, clip, dest);
       }
     }
   }
