@@ -97,11 +97,17 @@ export class Game {
   update(){
     this.events.poll();
 
-    // Generate collision graph/ model/ map for player
+    // Generate collision graph for player
     let collisionBoxes: Rect[] = [];
     for (let enemy of this.enemies) {
       collisionBoxes.push({ x: enemy.world.x, y: enemy.world.y, w: enemy.view.w, h: enemy.view.h });
     }
+    for (let tile of this.activeMap.tilemap.viewTiles){
+      if (tile.effect === 1){
+        collisionBoxes.push(tile.dest);
+      }
+    }
+    
 
     this.player.update(collisionBoxes);
     this.camera.update(this.player);
@@ -159,10 +165,16 @@ export class Game {
   private createMap(rawMap: any): GameMap{
 
     // Check rawmap properties
+    let tiles = [];
+    if (rawMap.tiles){
+      tiles = rawMap.tiles;
+    } else {
+      console.warn(`Tiles not specified in map file: ${rawMap.name}.json`);
+    }
   
     let gameMap = {
       id: rawMap.name,
-      tilemap: new Tilemap(32, rawMap.dimensions, rawMap.tiles),
+      tilemap: new Tilemap(32, rawMap.dimensions, tiles),
       playerSpawn: {
         x: rawMap.playerSpawn.x,
         y: rawMap.playerSpawn.y

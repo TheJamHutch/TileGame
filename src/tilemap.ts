@@ -23,7 +23,7 @@ export class Tilemap{
   tiles: Tile[];
   viewTiles: Tile[];
   
-  constructor(tileSize: TileSize, dimensions: Vector, tiles: Tile[] = []){
+  constructor(tileSize: TileSize, dimensions: Vector, tiles: Tile[]){
     this.id = 'tilemap';
     this.tileSize = tileSize;
     this.dimensions = dimensions;
@@ -31,22 +31,17 @@ export class Tilemap{
       x: dimensions.x * tileSize,
       y: dimensions.y * tileSize
     },
-    this.tiles = [];
+    this.tiles = []; 
     this.viewTiles = [];
-  
-    this.tiles = new Array(dimensions.x * dimensions.y) as any;
+
+    // Insert tiles from param
 
     // @TODO: The map editor should enforce that there is always a tile array in every map file. Therefore this code can be removed.
-    _.fill(this.tiles, { texture: 0, effect: 0, dest: null });
-    if (!_.isEmpty(tiles)){
-      let idx = 0;
-      for (const tile of tiles){
-        this.tiles[idx] = { texture: tile.texture, effect: tile.effect, dest: null };
-        idx++;
-      }
+    const nTiles = (dimensions.x * dimensions.y) + 1;
+    for (let i = 0; i < nTiles; i++)
+    {
+      this.tiles[i] = { texture: 0, effect: 0, dest: null };
     }
-    // @TODO: Tile array is one tile too short so need to push extra one to it
-    this.tiles.push({ texture: 0, effect: 0, dest: null });
   }
   
   render(context: CanvasRenderingContext2D, textureSheet: Bitmap, camera: Camera): void {
@@ -109,13 +104,18 @@ export class Tilemap{
       for (let x = start.x; x < end.x; x++)
       {
         const c = (y * this.dimensions.x) + x;
-        const tile = this.tiles[c];
-        clip = setClip(tile.texture, this.tileSize);
+        clip = setClip(this.tiles[c].texture, this.tileSize);
         dest.x = (x * this.tileSize) - camera.world.x;
         dest.y = (y * this.tileSize) - camera.world.y;
-        tile.dest = dest;
   
-        this.viewTiles.push(tile);
+        const worldTile = this.tiles[c];
+        worldTile.dest = {
+          x: x * this.tileSize,
+          y: y * this.tileSize,
+          w: this.tileSize,
+          h: this.tileSize
+        };
+        this.viewTiles.push(worldTile);
   
         drawBitmap(context, textureSheet, clip, dest);
       }
