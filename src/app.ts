@@ -1,6 +1,6 @@
 import { Events } from "./events";
 import { Game } from "./game";
-import { Global } from "./global";
+import { global } from "./global";
 
 export class App{
   events: any;
@@ -12,7 +12,7 @@ export class App{
 
     // @TODO: Must init events first
     this.events = Events();
-    Global.eventsRef = this.events;
+    global.eventsRef = this.events;
     
     // @TODO: Don't hardcode the config
     const config = {
@@ -20,7 +20,6 @@ export class App{
       initMap: 'overworld'
     };
     this.game = new Game(config, context);
-    Global.gameRef = this.game;
 
     // Init event listeners
     this.listeners.onMapSelect = ((id: string) => this.events.raise('mapChange', id));

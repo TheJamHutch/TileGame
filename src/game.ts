@@ -2,9 +2,9 @@ import { Rect, Vector } from './primitives';
 import { Tilemap } from './tilemap';
 import { Camera } from './camera'; 
 import { Player } from './player';
-import { Render } from './render';
+import { Bitmap, loadBitmap, drawBitmap, drawLine } from './render';
 import { Events } from './events';
-import { Global } from './global';
+import { global } from './global';
 import * as _ from 'lodash';
 
 import overworldMapJson from '../maps/overworld.json';
@@ -13,7 +13,7 @@ import townMapJson from '../maps/town.json';
 import roomMapJson from '../maps/room.json';
 
 import playerSheetJson from '../sheets/player.json';
-import { createSpritesheet, SpriteAnimation, SpriteSheet } from './sprites';
+import { Sprite, SpriteSheet, animateSprite } from './sprites';
 
 type GameMap = {
   id: string,
@@ -22,9 +22,6 @@ type GameMap = {
 };
 
 export class Game {
-  
-
-  // @TODO: Event listeners?
 
   resolution: Vector;
   camera?: Camera;
@@ -36,25 +33,15 @@ export class Game {
   context: CanvasRenderingContext2D;
   events: any;
 
-  get cameraPos(){
-    return {
-      x: this.camera.world.x,
-      y: this.camera.world.y
-    };
-  }
-
-  get playerPos(){
-    return {
-      x: this.player.world.x,
-      y: this.player.world.y
-    };
-  }
+  frameCount = 0;
+  targetFps = 60;
+  fps = 60;
 
   constructor(config: { resolution: Vector, initMap: string }, context: CanvasRenderingContext2D){
     this.context = context;
     this.resolution = config.resolution;
 
-    this.events = Global.eventsRef;
+    this.events = global.eventsRef;
 
     this.init(config);
   }
@@ -65,8 +52,8 @@ export class Game {
 
     // Load textures
     this.textures = {};
-    this.textures['tilemap'] = Render.loadBitmap('./img/basetiles.png');
-    this.textures['player'] = Render.loadBitmap('./img/player.png');
+    this.textures['tilemap'] = loadBitmap('./img/basetiles.png');
+    this.textures['player'] = loadBitmap('./img/player.png');
 
     // Load maps
     this.maps = {};
@@ -83,15 +70,9 @@ export class Game {
 
     // Load spritesheets
     this.sheets = {};
-    this.sheets[this.player.id] = createSpritesheet(this.textures['player'], playerSheetJson);
-
+    this.sheets[this.player.id] = new SpriteSheet(playerSheetJson);
+    
     this.events.register('mapChange', (mapName: string) => this.changeMap(mapName));
-
-    // @TODO: Remove
-    this.events.register('showPos', (context: any) => {
-      console.log('World:', this.player.world);
-      console.log('View:', this.player.view);
-    })
   }
 
   private render(){
@@ -101,19 +82,29 @@ export class Game {
     
     this.activeMap.tilemap.render(this.context, this.textures['tilemap'], this.camera);
   
-    Render.drawBitmap(this.context, this.sheets[this.player.id].texture, this.player.clip, this.player.view)
+    drawBitmap(this.context, this.textures[this.player.id], this.player.clip, this.player.view)
     
-    this.context.fillStyle = 'yellow';
-    //context.fillText(`Frames: ${this.timer.frameCount}`, 5, 20);
-    //context.fillText(`FPS: ${this.timer.fps}`, 5, 40);
+    this.context.fillStyle = 'red';
+    this.context.fillText(`Frame: ${this.frameCount}`, 550, 20);
+    this.context.fillText(`FPS: ${this.fps}`, 550, 40);
   }
 
   update(){
     this.events.poll();
 
     this.camera.update(this.player);
+
     this.player.update(this.camera, this.activeMap.tilemap.resolution, this.activeMap.tilemap.viewTiles);
+    animateSprite(this.player, this.sheets[this.player.id]);
     this.render();
+
+    this.frameCount++;
+    global.frameCount = this.frameCount;
+    if (this.frameCount >= this.targetFps){
+      this.fps = this.frameCount;
+      this.frameCount = 0;
+      global.frameCount = this.frameCount;
+    }
   }
 
   private createMap(rawMap: any): GameMap{
@@ -129,7 +120,7 @@ export class Game {
       }
     };
   
-    return gameMap
+    return gameMap;
   }
   
   changeMap(mapName: string): void {
@@ -158,18 +149,19 @@ export class Game {
     switch(key){
       case 'w':
         this.player.velocity.y = -1;
+        this.player.animationkey = 'walkNorth';
         break;
       case 's':
         this.player.velocity.y = 1;
+        this.player.animationkey = 'walkSouth';
         break;
       case 'a':
         this.player.velocity.x = -1;
+        this.player.animationkey = 'walkWest';
         break;
       case 'd':
         this.player.velocity.x = 1;
-        break;
-      case 'x':
-        this.events.raise('showPos', null);
+        this.player.animationkey = 'walkEast';
         break;
     }
   }
@@ -177,12 +169,20 @@ export class Game {
   onKeyUp(key: string){
     switch(key){
       case 'w':
+        this.player.velocity.y = 0;
+        this.player.animationkey = 'idleNorth';
+        break;
       case 's':
         this.player.velocity.y = 0;
+        this.player.animationkey = 'idleSouth';
         break;
       case 'a':
+        this.player.velocity.x = 0;
+        this.player.animationkey = 'idleWest';
+        break;
       case 'd':
         this.player.velocity.x = 0;
+        this.player.animationkey = 'idleEast';
         break;
     }
   }
