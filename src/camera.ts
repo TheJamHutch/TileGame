@@ -71,15 +71,23 @@ export class Camera {
     else if (this.locked.south && (player.world.y < this.worldBounds.y - (this.view.y / 2))){
       this.locked.south = false;
     }
-  
+
+    
+
     if (this.locked.west === false && this.locked.east === false){
-      const x = player.world.x - (player.view.x % this.view.x);
-      this.world.x = (x >= 0) ? x : 0;
+      this.world.x = (player.world.x + (player.view.w / 2)) - (this.view.x / 2 - (player.view.w / 2));
     }
     if (this.locked.north === false && this.locked.south === false){
       const y = player.world.y - (player.view.y % this.view.y);
       this.world.y = (y >= 0) ? y : 0;
     }
+  }
+
+  worldToView(world: Vector): Vector {
+    return {
+      x: world.x - this.world.x,
+      y: world.y - this.world.y
+    };
   }
 
 }
