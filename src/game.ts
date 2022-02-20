@@ -1,10 +1,11 @@
-import { Rect, Vector } from './primitives';
+import { Rect, Vector, rect_contains } from './primitives';
 import { Tilemap } from './tilemap';
 import { Camera } from './camera'; 
 import { Player } from './player';
 import { Bitmap, loadBitmap, drawBitmap, drawLine } from './render';
 import { Events } from './events';
 import { global } from './global';
+import { Enemy } from './enemy';
 import * as _ from 'lodash';
 
 import overworldMapJson from '../maps/overworld.json';
@@ -33,6 +34,8 @@ export class Game {
   context: CanvasRenderingContext2D;
   events: any;
 
+  enemy: Enemy;
+
   frameCount = 0;
   targetFps = 60;
   fps = 60;
@@ -54,6 +57,7 @@ export class Game {
     this.textures = {};
     this.textures['tilemap'] = loadBitmap('./img/basetiles.png');
     this.textures['player'] = loadBitmap('./img/player.png');
+    this.textures['slime'] = loadBitmap('./img/slime.png');
 
     // Load maps
     this.maps = {};
@@ -62,11 +66,13 @@ export class Game {
     this.maps['town'] = this.createMap(townMapJson);
     this.maps['room'] = this.createMap(roomMapJson);
 
-    // Create game objects
     this.activeMap = this.maps[config.initMap];
+
+    // Create game objects
     
     this.camera = new Camera(this.resolution, this.activeMap.tilemap.resolution, this.activeMap.playerSpawn);
     this.player = new Player(this.activeMap.playerSpawn, { x: 32, y: 32 });
+    this.enemy = new Enemy();
 
     // Load spritesheets
     this.sheets = {};
@@ -75,18 +81,23 @@ export class Game {
     this.events.register('mapChange', (mapName: string) => this.changeMap(mapName));
   }
 
-  private render(){
+  private worldToView(world: Vector): void {
 
-    this.context.fillStyle = 'black';
-    this.context.fillRect(0, 0, 640, 480);
-    
-    this.activeMap.tilemap.render(this.context, this.textures['tilemap'], this.camera);
-  
-    drawBitmap(this.context, this.textures[this.player.id], this.player.clip, this.player.view)
-    
-    this.context.fillStyle = 'red';
-    this.context.fillText(`Frame: ${this.frameCount}`, 550, 20);
-    this.context.fillText(`FPS: ${this.fps}`, 550, 40);
+  }
+
+  private entitiesInView(): Enemy[]
+  {
+    let visibleEntities = [];
+
+    if ((this.enemy.world.x + 32 > this.camera.world.x) && 
+        (this.enemy.world.x + 32 < this.camera.world.x + 640) && 
+        (this.enemy.world.y + 32 > this.camera.world.y) && 
+        (this.enemy.world.y + 32 < this.camera.world.y + 480))
+    {
+      visibleEntities.push(this.enemy);
+    }
+
+    return visibleEntities;
   }
 
   update(){
@@ -96,7 +107,11 @@ export class Game {
 
     this.player.update(this.camera, this.activeMap.tilemap.resolution, this.activeMap.tilemap.viewTiles);
     animateSprite(this.player, this.sheets[this.player.id]);
-    this.render();
+
+    this.enemy.view.x = this.enemy.world.x - this.camera.world.x;
+    this.enemy.view.y = this.enemy.world.y - this.camera.world.y;
+
+    this.render(this.entitiesInView());
 
     this.frameCount++;
     global.frameCount = this.frameCount;
@@ -105,6 +120,24 @@ export class Game {
       this.frameCount = 0;
       global.frameCount = this.frameCount;
     }
+  }
+
+  private render(entities: Enemy[]){
+
+    this.context.fillStyle = 'black';
+    this.context.fillRect(0, 0, 640, 480);
+    
+    this.activeMap.tilemap.render(this.context, this.textures['tilemap'], this.camera);
+  
+    drawBitmap(this.context, this.textures[this.player.id], this.player.clip, this.player.view);
+    
+    for (let entity of entities){
+      drawBitmap(this.context, this.textures[entity.id], entity.clip, entity.view);
+    }
+    
+    this.context.fillStyle = 'red';
+    this.context.fillText(`Frame: ${this.frameCount}`, 550, 20);
+    this.context.fillText(`FPS: ${this.fps}`, 550, 40);
   }
 
   private createMap(rawMap: any): GameMap{
