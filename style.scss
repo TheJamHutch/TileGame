@@ -10,34 +10,6 @@
   background-color: black;
   flex: 1 1 auto;
   height: 100%;
-
-  .controls-box{
-    position: absolute;
-    top: 20px;
-    left: 100px;
-    width: 200px;
-    height: 50px;
-    border: 1px solid grey;
-    padding: 5px;
-
-    label{
-      color: white;
-    }
-  }
-
-  .debug-box{
-    position: absolute;
-    top: 20px;
-    left: 350px;
-    width: 200px;
-    height: 50px;
-    border: 1px solid grey;
-    padding: 5px;
-
-    span{
-      color: white;
-    }
-  }
   
   canvas{
     border: 1px solid grey;

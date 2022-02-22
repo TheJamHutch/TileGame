@@ -14,8 +14,8 @@ export class Player implements Sprite {
 
   constructor(spawnPos: Vector, spriteSize: Vector){
     this.id = 'player';
-    this.clip = { x: 0, y: 0, w: spriteSize.x, h: spriteSize.y };
-    this.view = { x: spawnPos.x, y: spawnPos.y, w: spriteSize.x, h: spriteSize.y };
+    this.clip = new Rect({ x: 0, y: 0, w: spriteSize.x, h: spriteSize.y });
+    this.view = new Rect({ x: spawnPos.x, y: spawnPos.y, w: spriteSize.x, h: spriteSize.y });
     this.world = { x: spawnPos.x, y: spawnPos.y };
     this.velocity = { x: 0, y: 0 };
     this.moveSpeed = 2;
@@ -28,7 +28,7 @@ export class Player implements Sprite {
     // Check world bounds
     if (this.velocity.x < 0 && this.world.x <= 0){
       this.velocity.x = 0;
-    } else if (this.velocity.x > 0 && (this.world.x > global.worldBounds.x)){
+    } else if (this.velocity.x > 0 && ((this.world.x + this.view.w) > global.worldBounds.x)){
       this.velocity.x = 0;
     }
     if (this.velocity.y < 0 && this.world.y <= 0){
@@ -39,12 +39,7 @@ export class Player implements Sprite {
     
     // Check collision
     for (let box of collisionBoxes) {
-      const worldRect = {
-        x: this.world.x,
-        y: this.world.y,
-        w: this.view.w,
-        h: this.view.h
-      };
+      const worldRect = new Rect({ x: this.world.x, y: this.world.y, w: this.view.w, h: this.view.h});
 
       let collideDir = this.checkCollision(worldRect, box);
 
@@ -66,20 +61,7 @@ export class Player implements Sprite {
   }
 
   // @TODO: Refactor and comment
-  private checkCollision(rectA: Rect, rectB: Rect): string {
-    const a = {
-      left: rectA.x,
-      top: rectA.y,
-      right: rectA.x + rectA.w,
-      bottom: rectA.y + rectA.h
-    };
-    const b = {
-      left: rectB.x,
-      top: rectB.y,
-      right: rectB.x + rectB.w,
-      bottom: rectB.y + rectB.h
-    };
-
+  private checkCollision(a: Rect, b: Rect): string {
     const collision = ((a.right > b.left && a.left < b.right) && (a.top < b.bottom && a.bottom > b.top));
     let collideDir = 'none';
 

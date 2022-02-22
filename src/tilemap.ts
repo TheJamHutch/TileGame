@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import { Vector, Rect } from './primitives';
 import { Camera } from './camera';
 import { Bitmap, loadBitmap, drawBitmap } from './render';
+import { setClip } from './sprites';
 
 export enum TileSize {
   SMALL = 8,
@@ -37,45 +38,20 @@ export class Tilemap{
     // Insert tiles from param
 
     // @TODO: The map editor should enforce that there is always a tile array in every map file. Therefore this code can be removed.
-    const nTiles = (dimensions.x * dimensions.y) + 1;
-    for (let i = 0; i < nTiles; i++)
+    const nTiles = dimensions.x * dimensions.y;
+    
+    let blankMap = false;
+    const blankTile = { texture: 0, effect: 0, dest: null } as any;
+    if (!tiles || tiles.length < nTiles){
+      blankMap = true;
+    }
+    for (let i = 0; i <= nTiles; i++)
     {
-      this.tiles[i] = { texture: 0, effect: 0, dest: null };
+      this.tiles[i] = (!blankMap) ? tiles[i] : blankTile;
     }
   }
   
   render(context: CanvasRenderingContext2D, textureSheet: Bitmap, camera: Camera): void {
-  
-    function setClip(index: number, tileSize: number): Rect {
-  
-      let sheetDims = textureSheet.dimensions;
-      let x = 0;
-      let y = 0;
-      let c = 0;
-    
-      while (c < index){
-        x += 1;
-        if (x >= sheetDims.x){
-          x = 0;
-          y++;
-    
-          if (y >= sheetDims.y){
-            x = 0;
-            y = 0;
-          }
-        }
-    
-        c++;
-      }
-    
-      return {
-        x: x * tileSize,
-        y: y * tileSize, 
-        w: tileSize, 
-        h: tileSize
-      };
-    }
-  
   
     this.viewTiles.splice(0, this.viewTiles.length);
   
@@ -97,26 +73,26 @@ export class Tilemap{
       y: (this.dimensions.y > inView.y) ? start.y + inView.y + 1 : this.dimensions.y
     };
   
-    let clip = { x: 0, y: 0, w: this.tileSize, h: this.tileSize };
-    let dest = { x: 0, y: 0, w: this.tileSize, h: this.tileSize };
+    let clip = new Rect({ x: 0, y: 0, w: this.tileSize, h: this.tileSize });
+    let dest = new Rect({ x: 0, y: 0, w: this.tileSize, h: this.tileSize });
     for (let y = start.y; y < end.y; y++)
     {
       for (let x = start.x; x < end.x; x++)
       {
         const c = (y * this.dimensions.x) + x;
-        clip = setClip(this.tiles[c].texture, this.tileSize);
+        clip = setClip(this.tiles[c].texture, this.tileSize, textureSheet.dimensions);
         dest.x = (x * this.tileSize) - camera.world.x;
         dest.y = (y * this.tileSize) - camera.world.y;
   
         const worldTile = this.tiles[c];
-        worldTile.dest = {
-          x: x * this.tileSize,
-          y: y * this.tileSize,
-          w: this.tileSize,
+        worldTile.dest = new Rect({ 
+          x: x * this.tileSize, 
+          y: y * this.tileSize, 
+          w: this.tileSize, 
           h: this.tileSize
-        };
+        });
         this.viewTiles.push(worldTile);
-  
+
         drawBitmap(context, textureSheet, clip, dest);
       }
     }

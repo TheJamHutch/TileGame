@@ -2,6 +2,8 @@ import { Events } from "./events";
 import { Game } from "./game";
 import { global } from "./global";
 
+// @TODO: Combine this class with index.js and have that be the main app scrpt ???
+
 export class App{
   events: any;
   game: Game;
