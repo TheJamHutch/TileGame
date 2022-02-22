@@ -1,0 +1,17 @@
+{
+  "name": "bad",
+  "dimensions": {
+    "x": 1,
+    "y": 1  
+  },
+  "playerSpawn": {
+    "x": 0,
+    "y": 0
+  },
+  "enemies": [
+    { "archetype": "slime", "movement": "static", "startPos": { "x": 200, "y": 100 } },
+    { "archetype": "slime", "movement": "static", "startPos": { "x": 500, "y": 200 } },
+    { "archetype": "slime", "movement": "static", "startPos": { "x": 100, "y": 400 } },
+    { "archetype": "slime", "movement": "static", "startPos": { "x": 800, "y": 500 } }
+  ]
+}

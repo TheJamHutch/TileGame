@@ -6,7 +6,6 @@ import { global } from './global';
 
 export class Enemy implements Sprite {
   id: string;
-  archetypeId: string;
   clip: Rect;
   view: Rect;
   world: Vector;
@@ -14,18 +13,32 @@ export class Enemy implements Sprite {
   animationkey: string;
   moveSpeed: number;
 
-  constructor(archetypeId: string, startPos: Vector){
+  constructor(startPos: Vector){
     this.id = 'slime';
-    this.archetypeId = archetypeId;
-    this.clip = { x: 0, y: 0, w: 16, h: 16 };
-    this.view = { x: 0, y: 0, w: 32, h: 32 };
+    this.clip = new Rect({ x: 0, y: 0, w: 16, h: 16 });
+    this.view = new Rect({ x: 0, y: 0, w: 32, h: 32 });
     this.world = { x: startPos.x, y: startPos.y };
     this.velocity = { x: 1, y: 0 };
     this.animationkey = 'idleSouth';
     this.moveSpeed = 1;
+    
+    // @TODO: Check requested startPos to see it fits in world. Use rect_contains function
+    
   }
 
   update(){
 
   }
+}
+
+export function spawnEnemy(archetype: string, startPos: Vector): Enemy
+{
+  // Check start pos against world bounds
+
+  // Get sheet, stats etc. from archetype map
+
+
+
+  const enemy = new Enemy(startPos);
+  return enemy;
 }
