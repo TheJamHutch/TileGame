@@ -11,9 +11,31 @@
   "enemies": [
     { 
       "archetype": "slime", 
-      "movement": "static", 
+      "movementPattern": 0,
+      "moveWait": 100,
       "pathNodes": [
-        { "x": 200, "y": 100 }
+        { "x": 200, "y": 100 },
+        { "x": 500, "y": 100 },
+        { "x": 500, "y": 400 },
+        { "x": 200, "y": 400 },
+        { "x": 200, "y": 800 }
+      ]
+    },
+    { 
+      "archetype": "slime", 
+      "movementPattern": 0,
+      "moveWait": 100,
+      "pathNodes": [
+        { "x": 220, "y": 250 },
+        { "x": 480, "y": 250 }
+      ]
+    },
+    { 
+      "archetype": "slime", 
+      "movementPattern": 0,
+      "moveWait": 100,
+      "pathNodes": [
+        { "x": 50, "y": 50 }
       ]
     }
   ]

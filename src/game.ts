@@ -37,8 +37,6 @@ export class Game {
 
     this.events = global.eventsRef;
 
-    this.enemies = new Enemies();
-
     this.assetStore = new AssetStore();
     global.assetStoreRef = this.assetStore;
 
@@ -203,7 +201,7 @@ export class Game {
 
     // Load enemies
     // @TODO: New instead ???
-    this.enemies.load(gameMap.enemies);
+    this.enemies = new Enemies(gameMap.enemies);
   }
 
   onKeyDown(key: string){
