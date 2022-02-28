@@ -42,11 +42,13 @@ export class Enemies
 {
   enemiesList: Enemy[];
 
-  constructor(){
+  constructor()
+  {
     this.enemiesList = [];
   }
 
-  load(enemiesJson: any){
+  load(enemiesJson: any): void
+  {
     this.enemiesList = [];
     for (let enemy of enemiesJson)
     {
@@ -54,9 +56,11 @@ export class Enemies
     }
   }
 
-  getCollisionBoxes(): Rect[] {
+  getCollisionBoxes(): Rect[]
+  {
     let collisionBoxes: Rect[] = [];
-    for (let enemy of this.enemiesList) {
+    for (let enemy of this.enemiesList)
+    {
       const box = new Rect({ 
         x: enemy.world.x, 
         y: enemy.world.y, 
@@ -69,8 +73,10 @@ export class Enemies
     return collisionBoxes;
   }
 
-  update(camera: Camera): void {
-    for (let enemy of this.enemiesList) {
+  update(camera: Camera): void
+  {
+    for (let enemy of this.enemiesList)
+    {
       enemy.update();
 
       // Update view position
@@ -78,7 +84,7 @@ export class Enemies
       enemy.view.x = view.x;
       enemy.view.y = view.y;
 
-      //animateSprite(enemy, this.sheets[enemy.id]);
+      animateSprite(enemy, global.assetStoreRef.sheets[enemy.id]);
     }
   }
 
