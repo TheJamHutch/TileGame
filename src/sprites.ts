@@ -46,12 +46,12 @@ export function setClip(index: number, cellSize: number, sheetDims: Vector): Rec
     c++;
   }
 
-  return {
+  return new Rect({
     x: x * cellSize,
     y: y * cellSize, 
     w: cellSize, 
     h: cellSize
-  };
+  });
 }
 
 export function animateSprite(sprite: Sprite, sheet: SpriteSheet): void {

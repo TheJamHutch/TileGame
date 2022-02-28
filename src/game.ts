@@ -2,10 +2,10 @@ import { Rect, Vector } from './primitives';
 import { Tile, Tilemap } from './tilemap';
 import { Camera } from './camera'; 
 import { Player } from './player';
-import { Bitmap, loadBitmap, drawBitmap, drawLine } from './render';
+import { Bitmap, loadBitmap, drawBitmap, drawLine, drawRect } from './render';
 import { Events } from './events';
 import { global } from './global';
-import { Enemy, spawnEnemy } from './enemies';
+import { Enemy, Enemies, spawnEnemy } from './enemies';
 import { Sprite, SpriteSheet, animateSprite } from './sprites';
 import * as _ from 'lodash';
 
@@ -32,17 +32,21 @@ export class Game {
   sheets: any;
   context: CanvasRenderingContext2D;
   events: any;
-  enemies: Enemy[] = [];
+  enemies: Enemies;
   tilemap: Tilemap;
   frameCount = 0;
   targetFps = 60;
   fps = TARGET_FPS;
+
+  showDebugInfo: boolean = false;
 
   constructor(config: { resolution: Vector, initMap: string }, context: CanvasRenderingContext2D){
     this.context = context;
     this.resolution = config.resolution;
 
     this.events = global.eventsRef;
+
+    this.enemies = new Enemies();
 
     this.init(config);
   }
@@ -78,17 +82,9 @@ export class Game {
   update(){
     this.events.poll();
 
-    // Generate collision graph for player
-    let collisionBoxes: Rect[] = [];
-    for (let enemy of this.enemies) {
-      const box = new Rect({ 
-        x: enemy.world.x, 
-        y: enemy.world.y, 
-        w: enemy.view.w, 
-        h: enemy.view.h 
-      });
-      collisionBoxes.push(box);
-    }
+    // Calculate collision boxes for player
+    const enemyBoxes = this.enemies.getCollisionBoxes();
+    let collisionBoxes: Rect[] = enemyBoxes.slice(0);
     for (let tile of this.tilemap.viewTiles){
       if (tile.effect === 1){
         collisionBoxes.push(tile.dest);
@@ -105,19 +101,8 @@ export class Game {
     this.player.view.y = view.y;
 
     animateSprite(this.player, this.sheets[this.player.id]);
-    
 
-    // Loop through all entities (player plus any enemies)
-    for (let enemy of this.enemies) {
-      enemy.update();
-
-      // Update view position
-      let view = this.camera.worldToView(enemy.world);
-      enemy.view.x = view.x;
-      enemy.view.y = view.y;
-
-      animateSprite(enemy, this.sheets[enemy.id]);
-    }
+    this.enemies.update(this.camera);
 
     this.render();
 
@@ -130,6 +115,32 @@ export class Game {
     }
   }
 
+  private renderCollisionMesh(){
+    this.context.fillStyle = 'red';
+
+    const center = {
+      x: this.resolution.x / 2,
+      y: this.resolution.y / 2
+    };
+
+    drawLine(this.context, { x: 0, y: center.y }, { x: this.resolution.x, y: center.y });
+    drawLine(this.context, { x: center.x, y: 0 }, { x: center.x, y: this.resolution.y });
+    drawRect(this.context, this.player.view);
+    
+    const enemyBoxes = this.enemies.getCollisionBoxes();
+    for (let box of enemyBoxes)
+    {
+      const view = this.camera.worldToView({ x: box.x, y: box.y });
+      drawRect(this.context, new Rect({x: view.x, y: view.y, w: box.w, h: box.h }));
+    }
+  }
+
+  private renderFrameCounter(){
+    this.context.fillStyle = 'red';
+    this.context.fillText(`Frame: ${this.frameCount}`, 540, 20);
+    this.context.fillText(`FPS: ${this.fps}`, 540, 40);
+  }
+
   private render(){
 
     this.context.fillStyle = 'black';
@@ -140,13 +151,15 @@ export class Game {
     drawBitmap(this.context, this.textures[this.player.id], this.player.clip, this.player.view);
     
     // @TODO: Don't draw all enemies, only those that are in view
-    for (let entity of this.enemies){
+    for (let entity of this.enemies.enemiesList){
       drawBitmap(this.context, this.textures[entity.id], entity.clip, entity.view);
     }
-    
-    this.context.fillStyle = 'red';
-    this.context.fillText(`Frame: ${this.frameCount}`, 540, 20);
-    this.context.fillText(`FPS: ${this.fps}`, 540, 40);
+
+    if (this.showDebugInfo)
+    {
+      this.renderCollisionMesh();
+      this.renderFrameCounter();
+    }
   }
   
   // @ TODO: Implement a MapLoader class with a load() function and a precache() function?
@@ -212,12 +225,8 @@ export class Game {
     global.worldBounds = this.tilemap.resolution;
 
     // Load enemies
-    this.enemies = [];
-    const mapEnemies = gameMap.enemies;
-    for (let enemy of mapEnemies)
-    {
-      this.enemies.push(spawnEnemy(enemy.archetype, enemy.startPos));
-    }
+    // @TODO: New instead ???
+    this.enemies.load(gameMap.enemies);
   }
 
   onKeyDown(key: string){
@@ -237,6 +246,9 @@ export class Game {
       case 'd':
         this.player.velocity.x = 1;
         this.player.animationkey = 'walkEast';
+        break;
+      case 'c':
+        this.showDebugInfo = !this.showDebugInfo;
         break;
     }
   }

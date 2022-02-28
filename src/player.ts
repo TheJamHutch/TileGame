@@ -3,6 +3,57 @@ import { Rect, Vector } from './primitives';
 import { Sprite, SpriteSheet } from './sprites';
 import { global } from './global';
 
+enum MoveDirection
+{
+  Stop = 0,
+  North,
+  East,
+  South,
+  West
+};
+
+enum CollisionDirection
+{
+  None = 0,
+  North,
+  East,
+  South,
+  West
+};
+
+function directionToVelocity(direction: MoveDirection | CollisionDirection): Vector
+{
+  let vel = { x: 0, y: 0 };
+
+  switch(direction)
+  {
+    case 0:
+      break
+    case 1:
+      vel.y = -1;
+      break;
+    case 2:
+      vel.x = 1;
+      break;
+    case 3:
+      vel.y = 1;
+      break;
+    case 4:
+      vel.x = 1;
+      break;
+  }
+
+  return {
+    x: vel.x,
+    y: vel.y
+  };
+}
+
+function directionFromVelocity(vel: Vector): MoveDirection | CollisionDirection
+{
+  return MoveDirection.Stop;
+}
+
 export class Player implements Sprite {
   id: string;
   clip: Rect;
@@ -21,6 +72,7 @@ export class Player implements Sprite {
     this.moveSpeed = 2;
 
     this.animationkey = 'idleSouth';
+    
   }
 
   update(collisionBoxes: Rect[]): void {
@@ -43,14 +95,14 @@ export class Player implements Sprite {
 
       let collideDir = this.checkCollision(worldRect, box);
 
-      if (this.velocity.x > 0 && collideDir === 'east'){
+      if (this.velocity.x > 0 && collideDir === CollisionDirection.East){
         this.velocity.x = 0;
-      } else if (this.velocity.x < 0 && collideDir === 'west'){
+      } else if (this.velocity.x < 0 && collideDir === CollisionDirection.West){
         this.velocity.x = 0;
       }
-      if (this.velocity.y > 0 && collideDir === 'north'){
+      if (this.velocity.y > 0 && collideDir === CollisionDirection.North){
         this.velocity.y = 0;
-      } else if (this.velocity.y < 0 && collideDir === 'south'){
+      } else if (this.velocity.y < 0 && collideDir === CollisionDirection.South){
         this.velocity.y = 0;
       }
     }
@@ -61,28 +113,28 @@ export class Player implements Sprite {
   }
 
   // @TODO: Refactor and comment
-  private checkCollision(a: Rect, b: Rect): string {
+  private checkCollision(a: Rect, b: Rect): CollisionDirection {
     const collision = ((a.right > b.left && a.left < b.right) && (a.top < b.bottom && a.bottom > b.top));
-    let collideDir = 'none';
+    let collideDir = CollisionDirection.None;
 
     if (collision){
-      collideDir =  (a.left - b.right > 0 && a.right - b.left < 0) ? 'east' :
-                    (a.left - b.right > 0 && a.right - b.left < 0) ? 'west' : 'none';
+      collideDir =  (a.left - b.right > 0 && a.right - b.left < 0) ? CollisionDirection.East :
+                    (a.left - b.right > 0 && a.right - b.left < 0) ? CollisionDirection.West : CollisionDirection.None;
                
       let xc = a.left - b.left;
       let yc = a.top - b.top;
 
       if (Math.abs(xc) > Math.abs(yc)){
         if (xc < 0){
-          collideDir = 'east';
+          collideDir = CollisionDirection.East;
         } else if (xc > 0){
-          collideDir = 'west';
+          collideDir = CollisionDirection.West;
         }
       } else {
         if (yc < 0){
-          collideDir = 'north';
+          collideDir = CollisionDirection.North;
         } else if (yc > 0){
-          collideDir = 'south';
+          collideDir = CollisionDirection.South;
         }
       }
     }

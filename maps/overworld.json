@@ -9,9 +9,12 @@
     "y": 0
   },
   "enemies": [
-    { "archetype": "slime", "movement": "static", "startPos": { "x": 200, "y": 100 } },
-    { "archetype": "slime", "movement": "static", "startPos": { "x": 500, "y": 200 } },
-    { "archetype": "slime", "movement": "static", "startPos": { "x": 100, "y": 400 } },
-    { "archetype": "slime", "movement": "static", "startPos": { "x": 800, "y": 500 } }
+    { 
+      "archetype": "slime", 
+      "movement": "static", 
+      "pathNodes": [
+        { "x": 200, "y": 100 }
+      ]
+    }
   ]
 }

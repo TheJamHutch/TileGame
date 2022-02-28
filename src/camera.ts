@@ -6,8 +6,6 @@ export class Camera {
   world: Vector;
   worldBounds: Vector;
   view: Vector;
-  scrollsX: boolean;
-  scrollsY: boolean;
   locked: {
     north: boolean,
     east: boolean,
@@ -19,13 +17,13 @@ export class Camera {
     this.world = initPos;
     this.worldBounds = mapRes;
     this.view = resolution;
-    this.scrollsX = (this.worldBounds.x > this.view.x);
-    this.scrollsY = (this.worldBounds.y > this.view.y);
+    const scrollsX = (this.worldBounds.x > this.view.x);
+    const scrollsY = (this.worldBounds.y > this.view.y);
     this.locked = {
-      north: (!this.scrollsY || this.world.y <= 0), 
-      east: (!this.scrollsX), 
-      south: (!this.scrollsY), 
-      west: (!this.scrollsX || this.world.x <= 0)
+      north: (!scrollsY || this.world.y <= 0), 
+      east: (!scrollsX), 
+      south: (!scrollsY), 
+      west: (!scrollsX || this.world.x <= 0)
     };
 
     global.eventsRef.register('reload', this.onReload.bind(this));
@@ -36,10 +34,6 @@ export class Camera {
   }
   
   update(player: Player): void {
-
-    if (!this.scrollsX && !this.scrollsY){
-      return;
-    }
 
     // Lock camera
     if (player.velocity.x < 0 && this.world.x <= 0){
@@ -75,7 +69,9 @@ export class Camera {
     
 
     if (this.locked.west === false && this.locked.east === false){
-      this.world.x = (player.world.x + (player.view.w / 2)) - (this.view.x / 2 - (player.view.w / 2));
+      //this.world.x = (player.world.x + (player.view.w / 2)) - (this.view.x / 2 - (player.view.w / 2));
+      const x = player.world.x - (player.view.x % this.view.x);
+      this.world.x = (x >= 0) ? x : 0;
     }
     if (this.locked.north === false && this.locked.south === false){
       const y = player.world.y - (player.view.y % this.view.y);
