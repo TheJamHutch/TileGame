@@ -45,6 +45,30 @@
           { "x": 96, "y": 16 },
           { "x": 112, "y": 16 }
         ]
+      },
+      "walkSouth": {
+        "speed": 100,
+        "frames": [
+          { "x": 0, "y": 0 }
+        ]
+      },
+      "walkEast": {
+        "speed": 100,
+        "frames": [
+          { "x": 64, "y": 0 }
+        ]
+      },
+      "walkWest": {
+        "speed": 100,
+        "frames": [
+          { "x": 0, "y": 16 }
+        ]
+      },
+      "walkNorth": {
+        "speed": 100,
+        "frames": [
+          { "x": 64, "y": 16 }
+        ]
       }
     }
 }
