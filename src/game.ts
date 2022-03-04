@@ -5,7 +5,7 @@ import { Player } from './player';
 import { Bitmap, loadBitmap, drawBitmap, drawLine, drawRect } from './render';
 import { Events } from './events';
 import { global } from './global';
-import { Enemy, Enemies, spawnEnemy } from './enemies';
+import { Enemy, Enemies } from './enemies';
 import { Sprite, SpriteSheet, animateSprite } from './sprites';
 import { AssetStore } from './assets';
 import * as _ from 'lodash';
@@ -13,6 +13,8 @@ import * as _ from 'lodash';
 // @TODO: Move to const.ts file?
 const MAX_FRAME_COUNT = 1000;
 const TARGET_FPS = 60;
+
+const KEYCODE_SPACE = 32;
 
 export class Game {
 
@@ -199,30 +201,31 @@ export class Game {
 
     global.worldBounds = this.tilemap.resolution;
 
-    // Load enemies
-    // @TODO: New instead ???
     this.enemies = new Enemies(gameMap.enemies);
   }
 
   onKeyDown(key: string){
     switch(key){
-      case 'w':
+      case 'KeyW':
         this.player.velocity.y = -1;
         this.player.animationkey = 'walkNorth';
         break;
-      case 's':
+      case 'KeyS':
         this.player.velocity.y = 1;
         this.player.animationkey = 'walkSouth';
         break;
-      case 'a':
+      case 'KeyA':
         this.player.velocity.x = -1;
         this.player.animationkey = 'walkWest';
         break;
-      case 'd':
+      case 'KeyD':
         this.player.velocity.x = 1;
         this.player.animationkey = 'walkEast';
         break;
-      case 'c':
+      case 'Space':
+        this.player.attacking = true;
+        break;
+      case 'KeyC':
         this.showDebugInfo = !this.showDebugInfo;
         break;
     }
@@ -230,19 +233,19 @@ export class Game {
 
   onKeyUp(key: string){
     switch(key){
-      case 'w':
+      case 'KeyW':
         this.player.velocity.y = 0;
         this.player.animationkey = 'idleNorth';
         break;
-      case 's':
+      case 'KeyS':
         this.player.velocity.y = 0;
         this.player.animationkey = 'idleSouth';
         break;
-      case 'a':
+      case 'KeyA':
         this.player.velocity.x = 0;
         this.player.animationkey = 'idleWest';
         break;
-      case 'd':
+      case 'KeyD':
         this.player.velocity.x = 0;
         this.player.animationkey = 'idleEast';
         break;

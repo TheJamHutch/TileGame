@@ -62,6 +62,7 @@ export class Player implements Sprite {
   velocity: Vector;
   animationkey: string;
   moveSpeed: number;
+  attacking: boolean;
 
   constructor(spawnPos: Vector, spriteSize: Vector){
     this.id = 'player';
@@ -71,12 +72,22 @@ export class Player implements Sprite {
     this.velocity = { x: 0, y: 0 };
     this.moveSpeed = 2;
 
+    this.attacking = false;
+
     this.animationkey = 'idleSouth';
     
   }
 
   update(collisionBoxes: Rect[]): void {
+    if (this.attacking){
+      this.animationkey = 'attack';
+      if (global.frameCount % 100 === 1){
+        this.attacking = false;
+        this.animationkey = 'idleSouth';
+      }
+    }
 
+    // @TODO: Refactor into move function?
     // Check world bounds
     if (this.velocity.x < 0 && this.world.x <= 0){
       this.velocity.x = 0;

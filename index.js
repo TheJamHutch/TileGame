@@ -22,10 +22,10 @@ $(document).on('DOMContentLoaded', () => {
 
   // Bind app events to the corresponding DOM event or element.
   $(document).on('keydown', (e) => {
-    app.listeners.onKeyDown(e.key);
+    app.listeners.onKeyDown(e.code);
   });
   $(document).on('keyup', (e) => {
-    app.listeners.onKeyUp(e.key);
+    app.listeners.onKeyUp(e.code);
   });
   
   app.start(context);
