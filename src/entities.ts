@@ -6,15 +6,7 @@ import { Sprite, animateSprite } from './sprites';
 import { Tiling } from './tilemap';
 
 export namespace Entities{
-  export enum MoveDirection {
-    Stop = 0,
-    North,
-    East,
-    South,
-    West
-  };
-
-  export enum CollisionDirection {
+  export enum Direction {
     None = 0,
     North,
     East,
@@ -39,8 +31,7 @@ export namespace Entities{
     animationId: string;
     moveSpeed: number;
     indoors: boolean;
-    moveDirection: MoveDirection;
-    faceDirection: MoveDirection;
+    direction: Direction;
 
     prevAnimationId: string;
     attacking: boolean;
@@ -69,63 +60,54 @@ export namespace Entities{
       this.attacking = false;
       this.animationId = 'idleSouthArmed';
 
-      this.moveDirection = MoveDirection.Stop;
-      this.faceDirection = MoveDirection.South;
+      this.direction = Direction.South;
 
       this.attackBox = new Rect({ x: 0, y: 0, w: 64, h: 64 });
     }
 
-    setDirection(moveDirection: MoveDirection): void {
+    move(moveDirection: Direction): void {
       let stopped = false;
 
-      switch (moveDirection){
-        case MoveDirection.North:
+      this.direction = moveDirection;
+
+      switch (this.direction){
+        case Direction.North:
           this.velocity.y = -1;
           this.animationId = 'walkNorthArmed';
           break;
-        case MoveDirection.East:
+        case Direction.East:
           this.velocity.x = 1;
           this.animationId = 'walkEastArmed';
           break;
-        case MoveDirection.South:
+        case Direction.South:
           this.velocity.y = 1;
           this.animationId = 'walkSouthArmed';
           break;
-        case MoveDirection.West:
+        case Direction.West:
           this.velocity.x = -1;
           this.animationId = 'walkWestArmed';
           break;
-        case MoveDirection.Stop:
-          stopped = true;
-          break;
       }
+    }
 
-      if (stopped){
-        let prevMoveDirection = this.moveDirection;
-
-        switch (prevMoveDirection){
-          case MoveDirection.North:
-          this.velocity.y = 0;
-          this.animationId = 'idleNorthArmed';
-          break;
-        case MoveDirection.East:
-          this.velocity.x = 0;
-          this.animationId = 'idleEastArmed';
-          break;
-        case MoveDirection.South:
-          this.velocity.y = 0;
-          this.animationId = 'idleSouthArmed';
-          break;
-        case MoveDirection.West:
-          this.velocity.x = 0;
-          this.animationId = 'idleWestArmed';
-          break;
-        }
-      } else {
-        this.faceDirection = moveDirection;
+    stop(): void {
+      this.velocity.x = 0;
+      this.velocity.y = 0;
+      
+      switch (this.direction){
+        case Direction.North:
+        this.animationId = 'idleNorthArmed';
+        break;
+      case Direction.East:
+        this.animationId = 'idleEastArmed';
+        break;
+      case Direction.South:
+        this.animationId = 'idleSouthArmed';
+        break;
+      case Direction.West:
+        this.animationId = 'idleWestArmed';
+        break;
       }
-
-      this.moveDirection = moveDirection;
     }
 
     update(worldBounds: Vector, collisionBoxes: Rect[]): void {
@@ -165,14 +147,14 @@ export namespace Entities{
       // Check box collision
       for (let box of collisionBoxes) {
         let collideDir = checkCollision(worldRect, box);
-        if (this.velocity.x > 0 && collideDir === CollisionDirection.East){
+        if (this.velocity.x > 0 && collideDir === Direction.East){
           this.velocity.x = 0;
-        } else if (this.velocity.x < 0 && collideDir === CollisionDirection.West){
+        } else if (this.velocity.x < 0 && collideDir === Direction.West){
           this.velocity.x = 0;
         }
-        if (this.velocity.y > 0 && collideDir === CollisionDirection.North){
+        if (this.velocity.y > 0 && collideDir === Direction.North){
           this.velocity.y = 0;
-        } else if (this.velocity.y < 0 && collideDir === CollisionDirection.South){
+        } else if (this.velocity.y < 0 && collideDir === Direction.South){
           this.velocity.y = 0;
         }
       }
@@ -181,20 +163,20 @@ export namespace Entities{
       this.world.y += this.velocity.y * this.moveSpeed;
 
       // Place attack box so that it is in front of player according to direction.
-      switch (this.faceDirection){
-        case MoveDirection.North:
+      switch (this.direction){
+        case Direction.North:
           this.attackBox.x = this.world.x;
           this.attackBox.y = this.world.y - this.view.h;
           break; 
-        case MoveDirection.East:
+        case Direction.East:
           this.attackBox.x = this.world.x + this.view.w;
           this.attackBox.y = this.world.y;
           break; 
-        case MoveDirection.South:
+        case Direction.South:
           this.attackBox.x = this.world.x;
           this.attackBox.y = this.world.y + this.view.h;
           break; 
-        case MoveDirection.West:
+        case Direction.West:
           this.attackBox.x = this.world.x - this.view.w;
           this.attackBox.y = this.world.y;
           break; 
@@ -206,17 +188,17 @@ export namespace Entities{
       this.prevAnimationId = this.animationId;
       this.frameCount = 0;
 
-      switch (this.faceDirection){
-        case MoveDirection.North:
+      switch (this.direction){
+        case Direction.North:
           this.animationId = 'attackNorth';
           break; 
-        case MoveDirection.East:
+        case Direction.East:
           this.animationId = 'attackEast';
           break; 
-        case MoveDirection.South:
+        case Direction.South:
           this.animationId = 'attackSouth';
           break; 
-        case MoveDirection.West:
+        case Direction.West:
           this.animationId = 'attackWest';
           break; 
       }
@@ -286,28 +268,28 @@ export namespace Entities{
     }
   }
 
-  export function checkCollision(a: Rect, b: Rect): CollisionDirection {
+  export function checkCollision(a: Rect, b: Rect): Direction {
     const collision = ((a.right > b.left && a.left < b.right) && (a.top < b.bottom && a.bottom > b.top));
-    let collideDir = CollisionDirection.None;
+    let collideDir = Direction.None;
   
     if (collision){
-      collideDir =  (a.left - b.right > 0 && a.right - b.left < 0) ? CollisionDirection.East :
-                    (a.left - b.right > 0 && a.right - b.left < 0) ? CollisionDirection.West : CollisionDirection.None;
+      collideDir =  (a.left - b.right > 0 && a.right - b.left < 0) ? Direction.East :
+                    (a.left - b.right > 0 && a.right - b.left < 0) ? Direction.West : Direction.None;
                
       let xc = a.left - b.left;
       let yc = a.top - b.top;
   
       if (Math.abs(xc) > Math.abs(yc)){
         if (xc < 0){
-          collideDir = CollisionDirection.East;
+          collideDir = Direction.East;
         } else if (xc > 0){
-          collideDir = CollisionDirection.West;
+          collideDir = Direction.West;
         }
       } else {
         if (yc < 0){
-          collideDir = CollisionDirection.North;
+          collideDir = Direction.North;
         } else if (yc > 0){
-          collideDir = CollisionDirection.South;
+          collideDir = Direction.South;
         }
       }
     }

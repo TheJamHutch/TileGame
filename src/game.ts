@@ -42,16 +42,16 @@ export namespace Game{
     if (state.keyboardState === 'keydown'){
       switch(state.keycode){
         case 'KeyW':
-          state.player.setDirection(Entities.MoveDirection.North);
+          state.player.move(Entities.Direction.North);
           break;
         case 'KeyS':
-          state.player.setDirection(Entities.MoveDirection.South);
+          state.player.move(Entities.Direction.South);
           break;
         case 'KeyA':
-          state.player.setDirection(Entities.MoveDirection.West);
+          state.player.move(Entities.Direction.West);
           break;
         case 'KeyD':
-          state.player.setDirection(Entities.MoveDirection.East);
+          state.player.move(Entities.Direction.East);
           break;
         case 'Space':
           state.player.attack();
@@ -63,7 +63,7 @@ export namespace Game{
         case 'KeyS':
         case 'KeyA':
         case 'KeyD':
-          state.player.setDirection(Entities.MoveDirection.Stop);
+          state.player.stop();
           break;
       }
     }
@@ -118,7 +118,6 @@ export namespace Game{
       }
     }
 
-    /*
     const playerWorld = {
       x: state.player.world.x + (state.player.view.w / 2),
       y: state.player.world.y + (state.player.view.h / 2)
@@ -146,7 +145,7 @@ export namespace Game{
         state.tilemap.pushHiddenTiles(1, roofTiles); // @TODO: Hardcoded tile layer index
         state.player.indoors = true;
       }
-    }*/
+    }
 
     // Update all NPCS
     for (let npc of state.npcs){
@@ -242,7 +241,7 @@ export namespace Game{
       Rendering.renderSprite(texture, entity);
     }
   
-    renderCollisionMesh();
+    //renderCollisionMesh();
   }
 
   function renderCollisionMesh(){
