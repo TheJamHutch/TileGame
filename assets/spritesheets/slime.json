@@ -1,0 +1,74 @@
+{
+    "id": "slime",
+    "dimensions": {
+      "x": 4,
+      "y": 1
+    },
+    "clipSize": {
+      "x": 16,
+      "y": 16
+    },
+    "scaleFactor": 1,
+    "animations": {
+      "idleSouth": {
+        "speed": 100,
+        "frames": [
+          { "x": 0, "y": 0 },
+          { "x": 16, "y": 0 },
+          { "x": 32, "y": 0 },
+          { "x": 48, "y": 0 }
+        ]
+      },
+      "idleEast": {
+        "speed": 100,
+        "frames": [
+          { "x": 64, "y": 0 },
+          { "x": 80, "y": 0 },
+          { "x": 96, "y": 0 },
+          { "x": 112, "y": 0 }
+        ]
+      },
+      "idleWest": {
+        "speed": 100,
+        "frames": [
+          { "x": 0, "y": 16 },
+          { "x": 16, "y": 16 },
+          { "x": 32, "y": 16 },
+          { "x": 48, "y": 16 }
+        ]
+      },
+      "idleNorth": {
+        "speed": 100,
+        "frames": [
+          { "x": 64, "y": 16 },
+          { "x": 80, "y": 16 },
+          { "x": 96, "y": 16 },
+          { "x": 112, "y": 16 }
+        ]
+      },
+      "walkSouth": {
+        "speed": 100,
+        "frames": [
+          { "x": 0, "y": 0 }
+        ]
+      },
+      "walkEast": {
+        "speed": 100,
+        "frames": [
+          { "x": 64, "y": 0 }
+        ]
+      },
+      "walkWest": {
+        "speed": 100,
+        "frames": [
+          { "x": 0, "y": 16 }
+        ]
+      },
+      "walkNorth": {
+        "speed": 100,
+        "frames": [
+          { "x": 64, "y": 16 }
+        ]
+      }
+    }
+}

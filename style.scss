@@ -1,0 +1,25 @@
+@font-face {
+  font-family: 'myfont';
+  src: url('assets/fonts/AngelWishRegular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.viewport{
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100vw;
+  height: 100vh;
+}
+
+.content{
+  background-color: black;
+  flex: 1 1 auto;
+  height: 100%;
+  
+  canvas{
+    border: 1px solid grey;
+    margin: 100px;
+  }
+}

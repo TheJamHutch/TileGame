@@ -1,0 +1,179 @@
+{
+    "id": "player",
+    "dimensions": {
+      "x": 1,
+      "y": 1
+    },
+    "clipSize": {
+      "x": 32,
+      "y": 32
+    },
+    "scaleFactor": 2,
+    "animations": {
+      "idleSouth": {
+        "speed": 100,
+        "frames": [
+          { "x": 0, "y": 0 },
+          { "x": 1, "y": 0 },
+          { "x": 0, "y": 0 },
+          { "x": 2, "y": 0 }
+        ]
+      },
+      "idleEast": {
+        "speed": 100,
+        "frames": [
+          { "x": 3, "y": 0 }
+        ]
+      },
+      "idleWest": {
+        "speed": 100,
+        "frames": [
+          { "x": 4, "y": 0 }
+        ]
+      },
+      "idleNorth": {
+        "speed": 100,
+        "frames": [
+          { "x": 5, "y": 0 }
+        ]
+      },
+      "walkSouth": {
+        "speed": 5,
+        "frames": [
+          { "x": 0, "y": 0 },
+          { "x": 6, "y": 0 },
+          { "x": 0, "y": 0 },
+          { "x": 7, "y": 0 }
+        ]
+      },
+      "walkEast": {
+        "speed": 5,
+        "frames": [
+          { "x": 3, "y": 0 },
+          { "x": 8, "y": 0 },
+          { "x": 3, "y": 0 },
+          { "x": 9, "y": 0 }
+        ]
+      },
+      "walkWest": {
+        "speed": 5,
+        "frames": [
+          { "x": 4, "y": 0 },
+          { "x": 0, "y": 1 },
+          { "x": 4, "y": 0 },
+          { "x": 1, "y": 1 }
+        ]
+      },
+      "walkNorth": {
+        "speed": 5,
+        "frames": [
+          { "x": 5, "y": 0 },
+          { "x": 2, "y": 1 },
+          { "x": 5, "y": 0 },
+          { "x": 3, "y": 1 }
+        ]
+      },
+      "idleSouthArmed": {
+        "speed": 100,
+        "frames": [
+          { "x": 4, "y": 1 },
+          { "x": 5, "y": 1 },
+          { "x": 4, "y": 1 },
+          { "x": 6, "y": 1 }
+        ]
+      },
+      "idleEastArmed": {
+        "speed": 100,
+        "frames": [
+          { "x": 7, "y": 1 }
+        ]
+      },
+      "idleWestArmed": {
+        "speed": 100,
+        "frames": [
+          { "x": 8, "y": 1 }
+        ]
+      },
+      "idleNorthArmed": {
+        "speed": 100,
+        "frames": [
+          { "x": 9, "y": 1 }
+        ]
+      },
+      "walkSouthArmed": {
+        "speed": 5,
+        "frames": [
+          { "x": 4, "y": 1 },
+          { "x": 0, "y": 2 },
+          { "x": 4, "y": 1 },
+          { "x": 1, "y": 2 }
+        ]
+      },
+      "walkEastArmed": {
+        "speed": 5,
+        "frames": [
+          { "x": 7, "y": 1 },
+          { "x": 2, "y": 2 },
+          { "x": 7, "y": 1 },
+          { "x": 3, "y": 2 }
+        ]
+      },
+      "walkWestArmed": {
+        "speed": 5,
+        "frames": [
+          { "x": 8, "y": 1 },
+          { "x": 4, "y": 2 },
+          { "x": 8, "y": 1 },
+          { "x": 5, "y": 2 }
+        ]
+      },
+      "walkNorthArmed": {
+        "speed": 5,
+        "frames": [
+          { "x": 9, "y": 1 },
+          { "x": 6, "y": 2 },
+          { "x": 9, "y": 1 },
+          { "x": 7, "y": 2 }
+        ]
+      },
+      "attackSouth": {
+        "speed": 5,
+        "frames": [
+          { "x": 4, "y": 1 },
+          { "x": 8, "y": 2 },
+          { "x": 9, "y": 2 },
+          { "x": 0, "y": 3 },
+          { "x": 1, "y": 3 },
+          { "x": 2, "y": 3 },
+          { "x": 3, "y": 3 }
+        ]
+      },
+      "attackEast": {
+        "speed": 5,
+        "frames": [
+          { "x": 4, "y": 3 },
+          { "x": 5, "y": 3 },
+          { "x": 6, "y": 3 },
+          { "x": 7, "y": 3 }
+        ]
+      },
+      "attackWest": {
+        "speed": 5,
+        "frames": [
+          { "x": 4, "y": 4 },
+          { "x": 3, "y": 4 },
+          { "x": 2, "y": 4 },
+          { "x": 1, "y": 4 }
+        ]
+      },
+      "attackNorth": {
+        "speed": 5,
+        "frames": [
+          { "x": 9, "y": 1 },
+          { "x": 8, "y": 3 },
+          { "x": 9, "y": 3 },
+          { "x": 0, "y": 4 }
+        ]
+      }
+    }
+}

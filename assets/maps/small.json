@@ -1,0 +1,65 @@
+{
+	"id":"small",
+	"type":"map",
+	"tilemap":{
+		"dimensions":{
+			"x":4,
+			"y":4
+		},
+		"transitionTiles": [
+			{ "idx": 15, "mapId": "rev" }
+		],
+		"layers":[
+			{
+				"tilesheetId":"basetiles",
+				"tiles":[
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					10,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					10
+				]
+			},
+			{
+				"tilesheetId":"toptiles",
+				"tiles":[
+					-1,
+					-1,
+					2,
+					-1,
+					-1,
+					-1,
+					-1,
+					-1,
+					-1,
+					-1,
+					-1,
+					-1,
+					-1,
+					-1,
+					-1,
+					1
+				]
+			}
+		]
+	},
+	"entities":{
+		"player":{
+			"spawnPos":{
+				"x": 100,
+				"y": 10
+			}
+		}
+	}
+}
