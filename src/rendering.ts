@@ -57,7 +57,6 @@ export namespace Rendering{
   }
 
   export function strokeRect(rect: Rect){
-    state.context.lineWidth = 8;
     state.context.strokeRect(rect.x, rect.y, rect.w, rect.h);
   }
 

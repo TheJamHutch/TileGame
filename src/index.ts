@@ -25,7 +25,7 @@ $(async () => {
 
   // Request init config from server
   const initConfig = {
-    resolution: { x: 800, y: 600 },
+    resolution: { x: 1280, y: 1024 },
     initMapId: 'empty'
   };
 

@@ -20,17 +20,25 @@ export namespace Game{
     state.frameCount = 0;
     
     const initMap = Assets.store.maps[config.initMapId];
+    
     state.tilemap = new Tiling.Tilemap(initMap.tilemap);
 
-    let playerSheet = Assets.store.spritesheets['player'];
-    let playerMap = initMap.entities.player;
+    // Find the entity with the player archetype in the list of map entities.
+    const playerArchetypeId = 'player';
+    const playerIdx = initMap.entities.findIndex((entity: any) => entity.archetypeId === playerArchetypeId);
+    let playerSheet = Assets.store.spritesheets[playerArchetypeId];
+    let playerMap = initMap.entities[playerIdx];
+    
     const playerWorld = playerMap.spawnPos;
     state.camera = new Camera(state.resolution, state.tilemap.resolution, playerWorld);
     state.player = new Entities.Player(state.camera, playerMap, playerSheet);
 
+    // Remove player from the list of map entities
+    initMap.entities.splice(playerIdx, 1);
+
     state.npcs = [];
-    for (let rawNpc of initMap.entities.npc){
-      let npc = new Entities.Npc(state.camera, rawNpc, Assets.store.spritesheets['villager']);
+    for (let rawEntity of initMap.entities){
+      let npc = new Entities.Npc(state.camera, rawEntity, Assets.store.spritesheets[rawEntity.archetypeId]);
       state.npcs.push(npc);
     }
 
@@ -48,13 +56,19 @@ export namespace Game{
           state.player.move(Entities.Direction.South);
           break;
         case 'KeyA':
-          state.player.move(Entities.Direction.West);
+          state.player.move(Entities.Direction.West); 
           break;
         case 'KeyD':
           state.player.move(Entities.Direction.East);
           break;
         case 'Space':
           state.player.attack();
+          for (let npc of state.npcs){
+            let entityWorld = new Rect({ x: npc.world.x, y: npc.world.y, w: npc.view.w, h: npc.view.h });
+            if (Entities.checkCollision(state.player.attackBox, entityWorld)){
+              npc.hurt(10);
+            }
+          }
           break;
       }
     } else if (state.keyboardState === 'keyup'){
@@ -100,23 +114,6 @@ export namespace Game{
     state.camera.update(state.player, state.tilemap.resolution);
 
     state.player.update(state.tilemap.resolution, collisionBoxes);
-
-    if (state.player.attacking){
-      for (let npc of state.npcs){
-        let entityWorld = new Rect({ x: npc.world.x, y: npc.world.y, w: npc.view.w, h: npc.view.h });
-        if (Entities.checkCollision(state.player.attackBox, entityWorld)){
-          npc.hurt(1);
-        }
-      }
-    }
-
-    // Check for dead NPCs
-    for (let npc of state.npcs){
-      if (npc.hitpoints === 0){
-        let npcIdx = state.npcs.findIndex(v => v.world.x === npc.world.x);
-        state.npcs.splice(npcIdx, 1);
-      }
-    }
 
     const playerWorld = {
       x: state.player.world.x + (state.player.view.w / 2),
@@ -253,6 +250,8 @@ export namespace Game{
     Rendering.setDrawColor('red');
     Rendering.renderLine({ x: 0, y: viewCenter.y }, { x: state.resolution.x, y: viewCenter.y });
     Rendering.renderLine({ x: viewCenter.x, y: 0}, { x: viewCenter.x, y: state.resolution.y});
+
+    Rendering.strokeRect(state.player.view);
 
     const atkBox = state.player.attackBox;
     const view = worldToView(state.camera, atkBox);

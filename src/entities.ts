@@ -62,7 +62,7 @@ export namespace Entities{
 
       this.direction = Direction.South;
 
-      this.attackBox = new Rect({ x: 0, y: 0, w: 64, h: 64 });
+      this.attackBox = new Rect({ x: 0, y: 0, w: (this.view.w / 2), h: (this.view.h / 2) });
     }
 
     move(moveDirection: Direction): void {
@@ -165,20 +165,20 @@ export namespace Entities{
       // Place attack box so that it is in front of player according to direction.
       switch (this.direction){
         case Direction.North:
-          this.attackBox.x = this.world.x;
-          this.attackBox.y = this.world.y - this.view.h;
+          this.attackBox.x = this.world.x + (this.view.h / 4);
+          this.attackBox.y = this.world.y - this.attackBox.h;
           break; 
         case Direction.East:
           this.attackBox.x = this.world.x + this.view.w;
-          this.attackBox.y = this.world.y;
+          this.attackBox.y = this.world.y + (this.view.h / 4);
           break; 
         case Direction.South:
-          this.attackBox.x = this.world.x;
+          this.attackBox.x = this.world.x + (this.view.h / 4);
           this.attackBox.y = this.world.y + this.view.h;
           break; 
         case Direction.West:
-          this.attackBox.x = this.world.x - this.view.w;
-          this.attackBox.y = this.world.y;
+          this.attackBox.x = this.world.x - this.attackBox.w;
+          this.attackBox.y = this.world.y + (this.view.h / 4);
           break; 
       }
     }
@@ -221,6 +221,8 @@ export namespace Entities{
     frameCount = 0;
     hurting: boolean;
 
+    down: boolean;
+
     constructor(camera: Camera, entityMap: any, entitySheet: Assets.Spritesheet){
 
       const spriteSize = {
@@ -241,9 +243,15 @@ export namespace Entities{
       this.animationId = 'idleSouth';
       this.hurting = false;
       this.hitpoints = 100;
+
+      this.down = false;
     }
 
-    update(/*worldBounds: Vector*/): void {
+    update(): void {
+      if (this.down){
+        this.animationId = 'down';
+      }
+
       if (this.hurting){
         this.frameCount++;
         if (this.frameCount > 20){
@@ -258,10 +266,15 @@ export namespace Entities{
     }
 
     hurt(dmgVal: number){
+      if (this.down){
+        return;
+      }
+
       this.hurting = true;
       this.hitpoints -= dmgVal;
-      if (this.hitpoints < 0){
+      if (this.hitpoints <= 0){
         this.hitpoints = 0;
+        this.down = true;
       }
 
       this.animationId = 'damageSouth';

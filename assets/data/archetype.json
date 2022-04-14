@@ -1,0 +1,28 @@
+{
+    "player": {
+        "id": "player",
+        "hitpoints": 100
+    },
+    "villager": {
+        "id": "villager",
+        "hitpoints": 50,
+        "hostile": false,
+        "reasonable": true,
+        "movement": "path"
+    },
+    "guard": {
+        "id": "guard",
+        "hitpoints": 500,
+        "hostile": false,
+        "reasonable": true,
+        "movement": "static"
+    },
+    "rat": {
+        "id": "rat",
+        "hitpoints": 10,
+        "hostile": true,
+        "reasonable": false,
+        "movement": "roam",
+        "range": 5
+    }
+}
