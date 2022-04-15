@@ -14,6 +14,19 @@ export namespace Entities{
     West
   };
 
+  enum EntityState{ //@TODO: Action?
+    Idle,
+    Walk,
+    Hurt,
+    Down
+  }
+
+  enum MovementPattern{
+    Static,
+    Roam,
+    Path
+  }
+
   export interface Entity{
     id: string;
     archetypeId: string;
@@ -214,6 +227,14 @@ export namespace Entities{
     velocity: Vector;
     animationId: string;
     moveSpeed: number;
+    
+    entityState: EntityState;
+
+    movement = MovementPattern.Static;
+    pathNodes?: Vector[];
+    nextNode?: Vector;
+    nodeIdx: number;
+    reverse: boolean = false;
 
     hitpoints: number;
 
@@ -238,7 +259,19 @@ export namespace Entities{
       this.view = new Rect({ x: viewPos.x, y: viewPos.y, w: spriteSize.x, h: spriteSize.y });
       this.world = { x: worldPos.x, y: worldPos.y };
       this.velocity = { x: 0, y: 0 };
-      this.moveSpeed = 3;
+      this.moveSpeed = 1;
+
+      this.entityState = EntityState.Idle;
+
+      this.pathNodes = [];
+      if (entityMap.pathNodes){
+        this.movement = MovementPattern.Path;
+        for (let node of entityMap.pathNodes){
+          this.pathNodes.push(node);
+        }
+        this.nextNode = this.pathNodes[0];
+      }
+      this.nodeIdx = 0;
     
       this.animationId = 'idleSouth';
       this.hurting = false;
@@ -250,6 +283,7 @@ export namespace Entities{
     update(): void {
       if (this.down){
         this.animationId = 'down';
+        return;
       }
 
       if (this.hurting){
@@ -258,6 +292,53 @@ export namespace Entities{
           this.frameCount = 0;
           this.hurting = false;
           this.animationId = 'idleSouth';
+        }
+
+        return;
+      }
+
+      if (this.movement === MovementPattern.Roam){
+        
+      } else if (this.movement === MovementPattern.Path){
+        this.movePath();
+      }
+      
+    }
+
+    movePath(): void {
+      if (this.world.x < this.nextNode.x){
+        this.velocity.x = 1;
+        this.animationId = 'walkEast';
+      } else if (this.world.x > this.nextNode.x){
+        this.velocity.x = -1;
+        this.animationId = 'walkWest';
+      } else {
+        this.velocity.x = 0;
+
+        if (this.world.y < this.nextNode.y){
+          this.velocity.y = 1;
+          this.animationId = 'walkSouth';
+        } else if (this.world.y > this.nextNode.y){
+          this.velocity.y = -1;
+          this.animationId = 'walkNorth';
+        } else {
+          this.velocity.y = 0;
+
+          
+
+          if (this.nodeIdx >= this.pathNodes.length - 1){
+            this.reverse = true;
+          } else if (this.nodeIdx <= 0){
+            this.reverse = false;
+          }
+          if (this.reverse){
+            
+            this.nodeIdx--;
+          } else {
+            this.nodeIdx++;
+          }
+
+          this.nextNode = this.pathNodes[this.nodeIdx];
         }
       }
 

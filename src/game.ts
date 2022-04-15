@@ -251,7 +251,9 @@ export namespace Game{
     Rendering.renderLine({ x: 0, y: viewCenter.y }, { x: state.resolution.x, y: viewCenter.y });
     Rendering.renderLine({ x: viewCenter.x, y: 0}, { x: viewCenter.x, y: state.resolution.y});
 
-    Rendering.strokeRect(state.player.view);
+    for (let entity of allEntities()){
+      Rendering.strokeRect(entity.view);
+    }
 
     const atkBox = state.player.attackBox;
     const view = worldToView(state.camera, atkBox);

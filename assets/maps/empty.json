@@ -90021,31 +90021,24 @@
 		},
 		{
 			"archetypeId": "villager",
-			"spawnPos": { "x": 200, "y": 200 }
+			"spawnPos": { "x": 150, "y": 100 }
 		},
 		{
 			"archetypeId": "villager",
-			"spawnPos": { "x": 500, "y": 150 }
+			"spawnPos": { "x": 500, "y": 200 },
+			"pathNodes": [
+				{ "x": 100, "y": 200 },
+				{ "x": 100, "y": 300 },
+				{ "x": 300, "y": 300 }
+			]
 		},
 		{
 			"archetypeId": "villager",
-			"spawnPos": { "x": 650, "y": 300 }
-		},
-		{
-			"archetypeId": "villager",
-			"spawnPos": { "x": 5000, "y": 1500 }
-		},
-		{
-			"archetypeId": "villager",
-			"spawnPos": { "x": 1500, "y": 350 }
-		},
-		{
-			"archetypeId": "villager",
-			"spawnPos": { "x": 1100, "y": 700 }
-		},
-		{
-			"archetypeId": "villager",
-			"spawnPos": { "x": 1100, "y": 600 }
+			"spawnPos": { "x": 650, "y": 300 },
+			"pathNodes": [
+				{ "x": 450, "y": 300 },
+				{ "x": 450, "y": 400 }
+			]
 		}
 	]
 }
