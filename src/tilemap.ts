@@ -30,8 +30,8 @@ export namespace Tiling{
     resolution: Vector;
     transitionTiles: { idx: number, mapId: string }[];
   
-    constructor(tilemap: any){
-      this.tileSize = 32; // @ TODO: HARDCODED
+    constructor(tilemap: any, tileSize: number){
+      this.tileSize = tileSize;
       this.topLayerIdx = -1;
       this.dimensions = tilemap.dimensions;
       this.transitionTiles = tilemap.transitionTiles
@@ -187,7 +187,6 @@ export namespace Tiling{
       y: (tilemap.dimensions.y > inView.y) ? start.y + inView.y + 1 : tilemap.dimensions.y
     };
     
-    // @TODO: Restore offset
     const scrollsX = (tilemap.resolution.x > camera.view.w);
     const scrollsY = (tilemap.resolution.y > camera.view.h);
     const offset = {
@@ -212,9 +211,9 @@ export namespace Tiling{
             const tileIsAnimated = (sheet.animatedMap[tileType] === 1);
             if (tileIsAnimated){
               // Find the correct animation to use from the tilesheet.
-              let animation = sheet.tileAnimations.find((anims: number[]) => anims[0] === tileType);
-              let animIdx = Math.floor(((frameCount / 80) % animation.length)); // @TODO: Hardcoded animation speed
-              let idx = animation[animIdx];
+              let animation = sheet.tileAnimations.find((anims: any) => anims.id === tileType);
+              let animIdx = Math.floor(((frameCount / animation.speed) % animation.frames.length));
+              let idx = animation.frames[animIdx];
               clip = setClip(idx, sheet.clipSize, sheet.dimensions);
             }
             
@@ -258,7 +257,7 @@ export namespace Tiling{
     let tile = {} as any;
     for (let layer of tilemap.layers){
       const sheet = Assets.store.tilesheets[layer.tilesheetId];
-      const rawTile = layer.tiles[tileIdx]; // @TODO: Hardcoded layer index
+      const rawTile = layer.tiles[tileIdx];
       if (rawTile > -1){
         tile = {
           pos: tilePos,

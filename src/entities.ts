@@ -14,7 +14,7 @@ export namespace Entities{
     West
   };
 
-  enum EntityState{ //@TODO: Action?
+  enum EntityState{
     Idle,
     Walk,
     Attack,
@@ -177,7 +177,6 @@ export namespace Entities{
       }
 
 
-      // @TODO: Refactor into move function?
       // Check world bounds
       if (this.velocity.x < 0 && this.world.x <= 0){
         this.velocity.x = 0;

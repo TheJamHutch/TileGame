@@ -1,4 +1,3 @@
-// @TODO: Make this a class?
 export type Vector = {
   x: number,
   y: number

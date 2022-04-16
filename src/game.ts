@@ -12,8 +12,7 @@ import * as _ from 'lodash';
 export namespace Game{
   export let keyDown: string;
 
-  // @TODO: Dont export
-  export const state = {} as any;
+  const state = {} as any;
 
   export function init(config: any){
     state.resolution = config.resolution;
@@ -21,7 +20,7 @@ export namespace Game{
     
     const initMap = Assets.store.maps[config.initMapId];
     
-    state.tilemap = new Tiling.Tilemap(initMap.tilemap);
+    state.tilemap = new Tiling.Tilemap(initMap.tilemap, config.tileSize);
 
     // Find the entity with the player archetype in the list of map entities.
     const playerArchetypeId = 'player';
@@ -44,6 +43,10 @@ export namespace Game{
 
     state.prevMapId = initMap.id;
     state.mapId = initMap.id;
+
+    state.config = config;
+
+    console.log(state.prevMapId, state.mapId);
   }
 
   function handleKeypress(): void {
@@ -116,10 +119,11 @@ export namespace Game{
     state.player.update(state.tilemap.resolution, collisionBoxes);
 
     const playerWorld = {
-      x: state.player.world.x + (state.player.view.w / 2),
-      y: state.player.world.y + (state.player.view.h / 2)
+      x: state.player.world.x,
+      y: state.player.world.y
     };
     const playerTile = Tiling.getTileAtWorldPos(state.tilemap, playerWorld);
+    
     
     if (playerTile.effect == Tiling.TileEffect.Transition){
       if (!state.justTransitioned){
@@ -198,7 +202,7 @@ export namespace Game{
   function transitionMap(mapId: string){
     const map = Assets.store.maps[mapId];
     
-    state.tilemap = new Tiling.Tilemap(map.tilemap);
+    state.tilemap = new Tiling.Tilemap(map.tilemap, state.config.tileSize);
     
     // Get the ID of the map you've just transitioned from
     // Get the transitionData for the map that is to be transitioned to
@@ -211,18 +215,34 @@ export namespace Game{
     let tilePos = state.tilemap.indexToPos(tileIdx);
     let worldPos = Tiling.tilePosToWorldPos(state.tilemap, tilePos);
     const playerWorld = worldPos;
+    console.log(worldPos);
+    
 
     // Recreate game objects (camera, player, enemies)
-    let playerSheet = Assets.store.spritesheets['player'];
-    let playerMap = map.entities.player;
+    const playerArchetypeId = 'player';
+    const playerIdx = map.entities.findIndex((entity: any) => entity.archetypeId === playerArchetypeId);
+    let playerSheet = Assets.store.spritesheets[playerArchetypeId];
+    let playerMap = map.entities[playerIdx];
     state.camera = new Camera(state.resolution, state.tilemap.resolution, playerWorld);
+
+    // Override the player's spawn position in the map
+    playerMap.spawnPos = playerWorld;
     state.player = new Entities.Player(state.camera, playerMap, playerSheet);
+
+    // Remove player from the list of map entities
+    map.entities.splice(playerIdx, 1);
+
+    state.npcs = [];
+    for (let rawEntity of map.entities){
+      let npc = new Entities.Npc(state.camera, rawEntity, Assets.store.spritesheets[rawEntity.archetypeId]);
+      state.npcs.push(npc);
+    }
 
     state.prevMapId = state.mapId;
     state.mapId = mapId;
 
-    // @TODO: Find another way
     state.justTransitioned = true;
+    console.log(state.prevMapId, state.mapId);
   }
 
   function render(){

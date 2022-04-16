@@ -46,8 +46,7 @@ export namespace Rendering{
   }
   
   export function fillRect(rect: Rect, opacity?: number){
-    // @TODO: Check opacity is in range
-    if (opacity){
+    if (opacity && (opacity >= 0 && opacity <= 1)){
       state.context.globalAlpha = opacity;
     }
 

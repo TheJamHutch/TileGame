@@ -55,7 +55,10 @@ export class Camera{
   }
 
   update(player: Entities.Player, worldBounds: Vector): void {
-    // @TODO: No need to run all this if camera doesn't scroll
+    // Camera doesn't need to move if the map doesn't scroll (camera is locked in all directions)
+    if (this.locked.north && this.locked.east && this.locked.south && this.locked.west){
+      return;
+    }
     
     // Lock camera
     if (player.velocity.x < 0 && this.world.x <= 0){

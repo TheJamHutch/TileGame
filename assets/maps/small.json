@@ -7,7 +7,7 @@
 			"y":4
 		},
 		"transitionTiles": [
-			{ "idx": 15, "mapId": "rev" }
+			{ "idx": 15, "mapId": "empty" }
 		],
 		"layers":[
 			{
@@ -54,12 +54,10 @@
 			}
 		]
 	},
-	"entities":{
-		"player":{
-			"spawnPos":{
-				"x": 100,
-				"y": 10
-			}
+	"entities": [
+		{
+			"archetypeId": "player",
+			"spawnPos": { "x": 0, "y": 0 }
 		}
-	}
+	]
 }
