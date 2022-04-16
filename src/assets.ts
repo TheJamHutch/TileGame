@@ -10,8 +10,8 @@ export namespace Assets{
   const DATA_PATH = 'assets/data/';
 
   const assetFiles = {
-    textures: ['basetiles', 'overtiles', 'villager', 'slime', 'player'],
-    maps: ['wretch', 'tesst', 'small', 'rev', 'empty', 'newone'],
+    textures: ['basetiles', 'basetiles_night', 'overtiles', 'villager', 'slime', 'player'],
+    maps: ['wretch', 'tesst', 'small', 'rev', 'empty', 'newone', 'daynight'],
     tilesheets: ['basetiles', 'toptiles' ],
     spritesheets: ['player', 'slime', 'villager'],
     data: ['archetypes']

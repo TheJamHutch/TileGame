@@ -268,7 +268,7 @@ export namespace Game{
       Rendering.renderSprite(texture, entity);
     }
   
-    //renderCollisionMesh();
+    renderCollisionMesh();
   }
 
   function renderCollisionMesh(){
