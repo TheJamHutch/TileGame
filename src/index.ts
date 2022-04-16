@@ -26,7 +26,7 @@ $(async () => {
   // Request init config from server
   const initConfig = {
     resolution: { x: 1280, y: 1024 },
-    initMapId: 'newone',
+    initMapId: 'daynight',
     tileSize: 32 // @TODO: Should tileSize be specified here or in the tilesheet?
   };
 
