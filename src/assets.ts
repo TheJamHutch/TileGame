@@ -7,19 +7,22 @@ export namespace Assets{
   const MAPS_PATH = 'assets/maps/';
   const TILESHEETS_PATH = 'assets/tilesheets/';
   const SPRITESHEETS_PATH = 'assets/spritesheets/';
+  const DATA_PATH = 'assets/data/';
 
   const assetFiles = {
     textures: ['basetiles', 'overtiles', 'villager', 'slime', 'player'],
     maps: ['wretch', 'tesst', 'small', 'rev', 'empty'],
     tilesheets: ['basetiles', 'toptiles' ],
-    spritesheets: ['player', 'slime', 'villager']
+    spritesheets: ['player', 'slime', 'villager'],
+    data: ['archetypes']
   };
 
   export const store = {
     textures: {},
     maps: {},
     tilesheets: {},
-    spritesheets: {}
+    spritesheets: {},
+    archetypes: {}
   } as any;
 
   export enum AssetType{
@@ -48,6 +51,8 @@ export namespace Assets{
     dimensions: Vector;
     solidMap: number[];
     effectMap: number[];
+    animatedMap: number[];
+    tileAnimations: Map<number, number[]>;
   }
 
   export type Spritesheet = {
@@ -64,6 +69,7 @@ export namespace Assets{
     await loadMaps();
     await loadTilesheets();
     await loadSpritesheets();
+    await loadData();
   }
 
   function createTexture(id: string, path: string){
@@ -75,6 +81,25 @@ export namespace Assets{
   function createTilesheet(tilesheetJson: any): Tilesheet{
     let tilesheet = {} as any;
     Object.assign(tilesheet, tilesheetJson);
+    /*
+    tilesheet.id = tilesheetJson.id;
+    tilesheet.textureId = tilesheetJson.textureId;
+    tilesheet.clipSize = tilesheetJson.clipSize;
+    tilesheet.dimensions = tilesheetJson.dimensions;
+    tilesheet.solidMap = tilesheetJson.solidMap;
+    tilesheet.effectMap = tilesheetJson.effectMap;
+    tilesheet.animatedMap = tilesheetJson.animatedMap;
+*/
+    /*
+    tilesheet.tileAnimations = new Map<number, number[]>();
+    if (tilesheetJson.tileAnimations){
+      for (let key of Object.keys(tilesheetJson.tileAnimations)){
+        let id = parseInt(key);
+        let items = tilesheetJson.tileAnimations[id];
+        tilesheet.tileAnimations.set(id, items);
+      }
+    }*/
+
     return tilesheet as Tilesheet;
   }
 
@@ -161,6 +186,18 @@ export namespace Assets{
       } catch(ex){
         console.warn(`Failed to load spritesheet asset: ${fileName}${ext}`);
       }
+    }
+  }
+
+  async function loadData(): Promise<any> {
+    const ext = '.json';
+    try{
+      const url = DATA_PATH + 'archetypes' + ext;
+      const rawJson = await fetchFileJson(url);
+      
+      store.archetypes = rawJson;
+    } catch(ex){
+      console.warn(`Failed to load spritesheet asset: archetypes${ext}`);
     }
   }
 }

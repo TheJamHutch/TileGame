@@ -160,7 +160,8 @@ export namespace Game{
     // Animate all sprites
     for (let entity of allEntities()){
       const sheet = Assets.store.spritesheets[entity.archetypeId];
-      const anim = sheet.animations[entity.animationId] as any;
+      const animId = Entities.getEntityAnimation(entity);
+      const anim = sheet.animations[animId] as any;
       animateSprite(entity, anim, state.frameCount);
     }
 
@@ -228,7 +229,7 @@ export namespace Game{
     Rendering.setDrawColor('black');
     Rendering.fillRect(new Rect({ x: 0, y: 0, w: state.resolution.x, h: state.resolution.y }));
     
-    Tiling.renderTilemap(state.tilemap, state.camera);
+    Tiling.renderTilemap(state.tilemap, state.camera, state.frameCount);
 
     const texture = Assets.store.textures[state.player.archetypeId];
     Rendering.renderSprite(texture, state.player);
@@ -251,7 +252,9 @@ export namespace Game{
     Rendering.renderLine({ x: 0, y: viewCenter.y }, { x: state.resolution.x, y: viewCenter.y });
     Rendering.renderLine({ x: viewCenter.x, y: 0}, { x: viewCenter.x, y: state.resolution.y});
 
-    Rendering.strokeRect(state.player.view);
+    for (let entity of allEntities()){
+      Rendering.strokeRect(entity.view);
+    }
 
     const atkBox = state.player.attackBox;
     const view = worldToView(state.camera, atkBox);

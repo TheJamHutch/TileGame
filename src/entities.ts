@@ -14,27 +14,94 @@ export namespace Entities{
     West
   };
 
+  enum EntityState{ //@TODO: Action?
+    Idle,
+    Walk,
+    Attack,
+    Hurt,
+    Down
+  }
+
+  enum MovementPattern{
+    Static,
+    Roam,
+    Path
+  }
+
   export interface Entity{
     id: string;
     archetypeId: string;
     world: Vector;
     velocity: Vector;
+    state: EntityState;
+    direction: Direction;
+    armed?: boolean;
   }
 
-  export class Player implements Entity {
+  // Builds a string from the entitiy's state, direction etc. to use as the animation ID.
+  export function getEntityAnimation(entity: Entity): string {
+    let animationId = '';
+    let skipTheRest = false;
+
+    switch (entity.state){
+      case EntityState.Idle:
+        animationId += 'idle';
+        break;
+      case EntityState.Walk:
+        animationId += 'walk';
+        break;
+      case EntityState.Attack:
+        animationId += 'attack';
+        break;
+      case EntityState.Hurt:
+        animationId += 'hurt';
+        break;
+      case EntityState.Down:
+        animationId = 'down';
+        skipTheRest = true;
+        break;
+    }
+
+    if (!skipTheRest){
+      switch(entity.direction){
+        case Direction.North:
+          animationId += '.north';
+          break; 
+        case Direction.East:
+          animationId += '.east';
+          break; 
+        case Direction.South:
+          animationId += '.south';
+          break; 
+        case Direction.West:
+          animationId += '.west';
+          break; 
+      }
+  
+      if (entity?.armed){
+        animationId += '.armed';
+      }
+    }
+    
+    return animationId;
+  }
+
+  export class Player implements Entity, Sprite {
     id: string;
     archetypeId: string;
     clip: Rect;
     view: Rect;
     world: Vector;
     velocity: Vector;
-    animationId: string;
     moveSpeed: number;
     indoors: boolean;
     direction: Direction;
+    hitpoints: number;
+
+    state: EntityState;
+    armed? = true;
 
     prevAnimationId: string;
-    attacking: boolean;
     // Local frame count for actions such as attacking, WTF TO DO WITH THIS?
     frameCount: number;
 
@@ -42,26 +109,29 @@ export namespace Entities{
 
     constructor(camera: Camera, playerMap: any, playerSheet: Assets.Spritesheet){
 
+      
+      const worldPos = playerMap.spawnPos;
+
+      this.id = 'player0';
+      this.archetypeId = 'player';
+      this.world = { x: worldPos.x, y: worldPos.y };
+      this.velocity = { x: 0, y: 0 };
+      this.indoors = false;
+      this.state = EntityState.Idle;
+      this.direction = Direction.South;
+
+      const archetype = Assets.store.archetypes[this.archetypeId];
+      this.moveSpeed = archetype.moveSpeed;
+      this.hitpoints = archetype.hitpoints;
+
+      // Init rects
       const spriteSize = {
         x: playerSheet.clipSize.x * playerSheet.scaleFactor,
         y: playerSheet.clipSize.y * playerSheet.scaleFactor
       };
-      const worldPos = playerMap.spawnPos;
       const viewPos = worldToView(camera, worldPos);
-
-      this.id = 'player0';
-      this.archetypeId = 'player';
       this.clip = new Rect({ x: 0, y: 0, w: playerSheet.clipSize.x, h: playerSheet.clipSize.y });
       this.view = new Rect({ x: viewPos.x, y: viewPos.y, w: spriteSize.x, h: spriteSize.y });
-      this.world = { x: worldPos.x, y: worldPos.y };
-      this.velocity = { x: 0, y: 0 };
-      this.moveSpeed = 4;
-      this.indoors = false;
-      this.attacking = false;
-      this.animationId = 'idleSouthArmed';
-
-      this.direction = Direction.South;
-
       this.attackBox = new Rect({ x: 0, y: 0, w: (this.view.w / 2), h: (this.view.h / 2) });
     }
 
@@ -69,23 +139,20 @@ export namespace Entities{
       let stopped = false;
 
       this.direction = moveDirection;
+      this.state = EntityState.Walk;
 
       switch (this.direction){
         case Direction.North:
           this.velocity.y = -1;
-          this.animationId = 'walkNorthArmed';
           break;
         case Direction.East:
           this.velocity.x = 1;
-          this.animationId = 'walkEastArmed';
           break;
         case Direction.South:
           this.velocity.y = 1;
-          this.animationId = 'walkSouthArmed';
           break;
         case Direction.West:
           this.velocity.x = -1;
-          this.animationId = 'walkWestArmed';
           break;
       }
     }
@@ -93,33 +160,20 @@ export namespace Entities{
     stop(): void {
       this.velocity.x = 0;
       this.velocity.y = 0;
-      
-      switch (this.direction){
-        case Direction.North:
-        this.animationId = 'idleNorthArmed';
-        break;
-      case Direction.East:
-        this.animationId = 'idleEastArmed';
-        break;
-      case Direction.South:
-        this.animationId = 'idleSouthArmed';
-        break;
-      case Direction.West:
-        this.animationId = 'idleWestArmed';
-        break;
-      }
+      this.state = EntityState.Idle;
     }
 
     update(worldBounds: Vector, collisionBoxes: Rect[]): void {
 
-      if (this.attacking){
+      if (this.state === EntityState.Attack){
         this.frameCount++;
 
         if (this.frameCount > 20){
           this.frameCount = 0;
-          this.attacking = false;
-          this.animationId = this.prevAnimationId;
+          this.state = EntityState.Idle;
         }
+
+        return;
       }
 
 
@@ -184,24 +238,8 @@ export namespace Entities{
     }
 
     attack(): void {
-      this.attacking = true;
-      this.prevAnimationId = this.animationId;
       this.frameCount = 0;
-
-      switch (this.direction){
-        case Direction.North:
-          this.animationId = 'attackNorth';
-          break; 
-        case Direction.East:
-          this.animationId = 'attackEast';
-          break; 
-        case Direction.South:
-          this.animationId = 'attackSouth';
-          break; 
-        case Direction.West:
-          this.animationId = 'attackWest';
-          break; 
-      }
+      this.state = EntityState.Attack;
     }
   }
 
@@ -212,16 +250,23 @@ export namespace Entities{
     view: Rect;
     world: Vector;
     velocity: Vector;
-    animationId: string;
     moveSpeed: number;
+    
+    state: EntityState;
+    prevState: EntityState;
+
+    direction: Direction;
+
+    movement = MovementPattern.Static;
+    pathNodes?: Vector[];
+    nextNode?: Vector;
+    nodeIdx: number;
+    reverse: boolean = false;
 
     hitpoints: number;
 
     // Local frame count
     frameCount = 0;
-    hurting: boolean;
-
-    down: boolean;
 
     constructor(camera: Camera, entityMap: any, entitySheet: Assets.Spritesheet){
 
@@ -233,31 +278,94 @@ export namespace Entities{
       const viewPos = worldToView(camera, worldPos);
 
       this.id = 'villager0';
-      this.archetypeId = 'villager';
+      this.archetypeId = entityMap.archetypeId;
       this.clip = new Rect({ x: 0, y: 0, w: entitySheet.clipSize.x, h: entitySheet.clipSize.y });
       this.view = new Rect({ x: viewPos.x, y: viewPos.y, w: spriteSize.x, h: spriteSize.y });
       this.world = { x: worldPos.x, y: worldPos.y };
       this.velocity = { x: 0, y: 0 };
-      this.moveSpeed = 3;
-    
-      this.animationId = 'idleSouth';
-      this.hurting = false;
-      this.hitpoints = 100;
+      this.prevState = EntityState.Idle;
+      this.state = EntityState.Idle;
+      this.direction = Direction.South;
 
-      this.down = false;
+      const archetype = Assets.store.archetypes[this.archetypeId];
+      this.moveSpeed = archetype.moveSpeed;
+      this.hitpoints = archetype.hitpoints;
+
+      // Init path stuff
+      this.pathNodes = [];
+      if (entityMap.pathNodes){
+        this.movement = MovementPattern.Path;
+        for (let node of entityMap.pathNodes){
+          this.pathNodes.push(node);
+        }
+        this.nextNode = this.pathNodes[0];
+        this.prevState = EntityState.Walk;
+        this.state = EntityState.Walk;
+      }
+      this.nodeIdx = 0;
     }
 
     update(): void {
-      if (this.down){
-        this.animationId = 'down';
-      }
 
-      if (this.hurting){
-        this.frameCount++;
-        if (this.frameCount > 20){
-          this.frameCount = 0;
-          this.hurting = false;
-          this.animationId = 'idleSouth';
+      switch(this.state){
+        case EntityState.Idle:
+          break;
+        case EntityState.Walk:
+          if (this.movement === MovementPattern.Roam){
+        
+          } else if (this.movement === MovementPattern.Path){
+            this.movePath();
+          }
+          break;
+        case EntityState.Attack:
+          break;
+        case EntityState.Hurt:
+          this.frameCount++;
+          if (this.frameCount > 20){
+            this.frameCount = 0;
+            this.changeState(this.prevState);
+          }
+          break;
+        case EntityState.Down:
+          // Do nothing if entity down.
+          break;
+      }
+    }
+
+    movePath(): void {
+      if (this.world.x < this.nextNode.x){
+        this.velocity.x = 1;
+        this.direction = Direction.East;
+      } else if (this.world.x > this.nextNode.x){
+        this.velocity.x = -1;
+        this.direction = Direction.West;
+      } else {
+        this.velocity.x = 0;
+
+        if (this.world.y < this.nextNode.y){
+          this.velocity.y = 1;
+          this.direction = Direction.South;
+        } else if (this.world.y > this.nextNode.y){
+          this.velocity.y = -1;
+          this.direction = Direction.North;
+        } else {
+          this.velocity.y = 0;
+
+          
+
+          if (this.nodeIdx >= this.pathNodes.length - 1){
+            this.reverse = true;
+          } else if (this.nodeIdx <= 0){
+            this.reverse = false;
+          }
+          if (this.reverse){
+            
+            this.nodeIdx--;
+          } else {
+            this.nodeIdx++;
+          }
+
+          this.nextNode = this.pathNodes[this.nodeIdx];
         }
       }
 
@@ -266,18 +374,21 @@ export namespace Entities{
     }
 
     hurt(dmgVal: number){
-      if (this.down){
+      if (this.state === EntityState.Down){
         return;
       }
 
-      this.hurting = true;
+      this.changeState(EntityState.Hurt);
       this.hitpoints -= dmgVal;
       if (this.hitpoints <= 0){
         this.hitpoints = 0;
-        this.down = true;
+        this.changeState(EntityState.Down);
       }
+    }
 
-      this.animationId = 'damageSouth';
+    changeState(state: EntityState){
+      this.prevState = this.state;
+      this.state = state;
     }
   }
 

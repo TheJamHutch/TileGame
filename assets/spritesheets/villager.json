@@ -10,7 +10,7 @@
     },
     "scaleFactor": 2,
     "animations": {
-      "idleSouth": {
+      "idle.south": {
         "speed": 100,
         "frames": [
           { "x": 0, "y": 0 },
@@ -19,25 +19,25 @@
           { "x": 2, "y": 0 }
         ]
       },
-      "idleEast": {
+      "idle.east": {
         "speed": 100,
         "frames": [
           { "x": 3, "y": 0 }
         ]
       },
-      "idleWest": {
+      "idle.west": {
         "speed": 100,
         "frames": [
           { "x": 4, "y": 0 }
         ]
       },
-      "idleNorth": {
+      "idle.north": {
         "speed": 100,
         "frames": [
           { "x": 5, "y": 0 }
         ]
       },
-      "walkSouth": {
+      "walk.south": {
         "speed": 5,
         "frames": [
           { "x": 0, "y": 0 },
@@ -46,7 +46,7 @@
           { "x": 7, "y": 0 }
         ]
       },
-      "walkEast": {
+      "walk.east": {
         "speed": 5,
         "frames": [
           { "x": 3, "y": 0 },
@@ -55,7 +55,7 @@
           { "x": 9, "y": 0 }
         ]
       },
-      "walkWest": {
+      "walk.west": {
         "speed": 5,
         "frames": [
           { "x": 4, "y": 0 },
@@ -64,7 +64,7 @@
           { "x": 1, "y": 1 }
         ]
       },
-      "walkNorth": {
+      "walk.north": {
         "speed": 5,
         "frames": [
           { "x": 5, "y": 0 },
@@ -73,7 +73,7 @@
           { "x": 3, "y": 1 }
         ]
       },
-      "damageSouth": {
+      "hurt.south": {
         "speed": 5,
         "frames": [
           { "x": 0, "y": 0 },
@@ -84,6 +84,45 @@
           { "x": 8, "y": 2 },
           { "x": 0, "y": 0 },
           { "x": 8, "y": 2 }
+        ]
+      },
+      "hurt.east": {
+        "speed": 5,
+        "frames": [
+          { "x": 3, "y": 0 },
+          { "x": 9, "y": 2 },
+          { "x": 3, "y": 0 },
+          { "x": 9, "y": 2 },
+          { "x": 3, "y": 0 },
+          { "x": 9, "y": 2 },
+          { "x": 3, "y": 0 },
+          { "x": 9, "y": 2 }
+        ]
+      },
+      "hurt.west": {
+        "speed": 5,
+        "frames": [
+          { "x": 4, "y": 0 },
+          { "x": 0, "y": 3 },
+          { "x": 4, "y": 0 },
+          { "x": 0, "y": 3 },
+          { "x": 4, "y": 0 },
+          { "x": 0, "y": 3 },
+          { "x": 4, "y": 0 },
+          { "x": 0, "y": 3 }
+        ]
+      },
+      "hurt.north": {
+        "speed": 5,
+        "frames": [
+          { "x": 5, "y": 0 },
+          { "x": 1, "y": 3 },
+          { "x": 5, "y": 0 },
+          { "x": 1, "y": 3 },
+          { "x": 5, "y": 0 },
+          { "x": 1, "y": 3 },
+          { "x": 5, "y": 0 },
+          { "x": 1, "y": 3 }
         ]
       },
       "down": {

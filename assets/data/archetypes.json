@@ -1,14 +1,16 @@
 {
     "player": {
         "id": "player",
-        "hitpoints": 100
+        "hitpoints": 100,
+        "moveSpeed": 4
     },
     "villager": {
         "id": "villager",
         "hitpoints": 50,
         "hostile": false,
         "reasonable": true,
-        "movement": "path"
+        "movement": "path",
+        "moveSpeed": 1
     },
     "guard": {
         "id": "guard",

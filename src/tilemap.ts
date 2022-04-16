@@ -171,7 +171,7 @@ export namespace Tiling{
     return viewTiles;
   }
   
-  export function renderTilemap(tilemap: Tilemap, camera: Camera): void {
+  export function renderTilemap(tilemap: Tilemap, camera: Camera, frameCount: number): void {
     //
     const inView = {
       x: Math.ceil(camera.view.w / tilemap.tileSize),
@@ -200,14 +200,24 @@ export namespace Tiling{
         for (let x = start.x; x < end.x; x++){
           const tileIdx = (y * tilemap.dimensions.x) + x;
           const layer = tilemap.layers[i];
+          const tileType = layer.tiles[tileIdx];
 
-          if (layer.tiles[tileIdx] > -1 && !tilemap.isTileHidden(tileIdx, i)){
-            
-            
+          if (tileType > -1 && !tilemap.isTileHidden(tileIdx, i)){
             const sheet = Assets.store.tilesheets[layer.tilesheetId];
             const texture = Assets.store.textures[sheet.textureId];
+
+            let clip = setClip(tileType, sheet.clipSize, sheet.dimensions);
+
+            // Overwrite clip if tile is animated
+            const tileIsAnimated = (sheet.animatedMap[tileType] === 1);
+            if (tileIsAnimated){
+              // Find the correct animation to use from the tilesheet.
+              let animation = sheet.tileAnimations.find((anims: number[]) => anims[0] === tileType);
+              let animIdx = Math.floor(((frameCount / 80) % animation.length)); // @TODO: Hardcoded animation speed
+              let idx = animation[animIdx];
+              clip = setClip(idx, sheet.clipSize, sheet.dimensions);
+            }
             
-            const clip = setClip(layer.tiles[tileIdx], sheet.clipSize, sheet.dimensions);
             const view = new Rect({ x: 0, y: 0, w: tilemap.tileSize, h: tilemap.tileSize });
             view.x = offset.x + ((x * tilemap.tileSize) - camera.world.x);
             view.y = offset.y + ((y * tilemap.tileSize) - camera.world.y);

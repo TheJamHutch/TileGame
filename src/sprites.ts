@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 import { Vector, Rect } from './primitives';
 
 export interface Sprite{
-  animationId: string;
   clip: Rect;
   view: Rect;
 };
