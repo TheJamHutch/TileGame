@@ -7,7 +7,7 @@
 			"y":300
 		},
 		"transitionTiles": [
-			{ "idx": 13, "mapId": "small"  }
+			{ "idx": 13, "mapId": "newone"  }
 		],
 		"layers":[
 			{

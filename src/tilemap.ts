@@ -19,6 +19,7 @@ export namespace Tiling{
     pos: Vector;
     solid: boolean;
     effect: number;
+    topLayerIdx?: number;
   };
   
   export class Tilemap{
@@ -76,8 +77,10 @@ export namespace Tiling{
 
     // @TOOD: popHiddenTiles ?
 
-    clearHiddenTiles(layerIdx: number): void {
-      this.layers[layerIdx].hiddenTiles = [];
+    clearHiddenTiles(): void {
+      for (let layer of this.layers){
+        layer.hiddenTiles = [];
+      }
     }
 
     isTileHidden(tileIdx: number, layerIdx: number): boolean {
@@ -146,7 +149,7 @@ export namespace Tiling{
         for (let x = start.x; x < end.x; x++){
           const tileIdx = (y * tilemap.dimensions.x) + x;
           const layer = tilemap.layers[i];
-          if (layer.tiles[tileIdx] > -1){
+          if (layer.tiles[tileIdx] > -1 && !tilemap.isTileHidden(tileIdx, i)){
           
             const tileType = layer.tiles[tileIdx];
             const tilesheet = Assets.store.tilesheets[layer.tilesheetId];
@@ -255,6 +258,7 @@ export namespace Tiling{
     };
     const tileIdx = tilemap.posToIndex(tilePos);
     let tile = {} as any;
+    let layerIdx = 0;
     for (let layer of tilemap.layers){
       const sheet = Assets.store.tilesheets[layer.tilesheetId];
       const rawTile = layer.tiles[tileIdx];
@@ -262,9 +266,11 @@ export namespace Tiling{
         tile = {
           pos: tilePos,
           solid: sheet.solidMap[rawTile],
-          effect: sheet.effectMap[rawTile]
+          effect: sheet.effectMap[rawTile],
+          topLayerIdx: layerIdx
         };
       }
+      layerIdx++;
     }
 
     

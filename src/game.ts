@@ -3,7 +3,6 @@ import { Tiling } from './tilemap';
 import { Camera, worldToView } from './camera'; 
 import { Entities } from './entities';
 import { Rendering } from './rendering';
-import { Enemy, initEnemy, updateEnemy } from './enemy';
 import { Sprite, animateSprite } from './sprites';
 import { Gui } from './gui';
 import { Assets } from './assets';
@@ -73,6 +72,9 @@ export namespace Game{
             }
           }
           break;
+        case 'Digit1':
+          state.player.hurt(20);
+          break;
       }
     } else if (state.keyboardState === 'keyup'){
       switch(state.keycode){
@@ -118,35 +120,7 @@ export namespace Game{
 
     state.player.update(state.tilemap.resolution, collisionBoxes);
 
-    const playerWorld = {
-      x: state.player.world.x,
-      y: state.player.world.y
-    };
-    const playerTile = Tiling.getTileAtWorldPos(state.tilemap, playerWorld);
-    
-    
-    if (playerTile.effect == Tiling.TileEffect.Transition){
-      if (!state.justTransitioned){
-        const tileIdx = state.tilemap.posToIndex(playerTile.pos);
-        const transitionTile = state.tilemap.transitionTiles.find((tile: any) => tile.idx == tileIdx);
-        transitionMap(transitionTile.mapId);
-      }
-    } else {
-      state.justTransitioned = false;
-    }
-    
-    if (state.player.indoors){
-      if (playerTile.effect != Tiling.TileEffect.Door && playerTile.effect != Tiling.TileEffect.Roof){
-        state.tilemap.clearHiddenTiles(1); // @TODO: Hardcoded tile layer index
-        state.player.indoors = false;
-      }
-    } else {
-      if (playerTile.effect == Tiling.TileEffect.Door){
-        const roofTiles = viewTiles.filter((val: any) => val.effect == Tiling.TileEffect.Roof);
-        state.tilemap.pushHiddenTiles(1, roofTiles); // @TODO: Hardcoded tile layer index
-        state.player.indoors = true;
-      }
-    }
+    playerOnEffectTile(viewTiles);
 
     // Update all NPCS
     for (let npc of state.npcs){
@@ -174,6 +148,44 @@ export namespace Game{
     state.frameCount++;
     if (state.frameCount > 1000){
       state.frameCount = 0;
+    }
+  }
+
+  function playerOnEffectTile(viewTiles: Tiling.Tile[]): void {
+    // Check player on effect tile
+    const playerWorld = {
+      x: state.player.world.x,
+      y: state.player.world.y
+    };
+    const playerTile = Tiling.getTileAtWorldPos(state.tilemap, playerWorld);
+
+    if (playerTile.effect == Tiling.TileEffect.Hurt){
+      state.player.hurt(1);
+    } else if (playerTile.effect == Tiling.TileEffect.Teleport){
+      console.log('telepuerto');
+    }
+
+    if (playerTile.effect == Tiling.TileEffect.Transition){
+      if (!state.justTransitioned){
+        const tileIdx = state.tilemap.posToIndex(playerTile.pos);
+        const transitionTile = state.tilemap.transitionTiles.find((tile: any) => tile.idx == tileIdx);
+        transitionMap(transitionTile.mapId);
+      }
+    } else {
+      state.justTransitioned = false;
+    }
+    
+    if (state.player.indoors){
+      if (playerTile.effect != Tiling.TileEffect.Door && playerTile.effect != Tiling.TileEffect.Roof){
+        state.tilemap.clearHiddenTiles(); // @TODO: Clear hiddent tiles for a specific layer? (Currently all layers)
+        state.player.indoors = false;
+      }
+    } else {
+      if (playerTile.effect == Tiling.TileEffect.Door){
+        const roofTiles = viewTiles.filter((val: any) => val.effect == Tiling.TileEffect.Roof);
+        state.tilemap.pushHiddenTiles(playerTile.topLayerIdx, roofTiles);
+        state.player.indoors = true;
+      }
     }
   }
 
@@ -215,8 +227,6 @@ export namespace Game{
     let tilePos = state.tilemap.indexToPos(tileIdx);
     let worldPos = Tiling.tilePosToWorldPos(state.tilemap, tilePos);
     const playerWorld = worldPos;
-    console.log(worldPos);
-    
 
     // Recreate game objects (camera, player, enemies)
     const playerArchetypeId = 'player';
@@ -242,7 +252,6 @@ export namespace Game{
     state.mapId = mapId;
 
     state.justTransitioned = true;
-    console.log(state.prevMapId, state.mapId);
   }
 
   function render(){

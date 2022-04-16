@@ -61,6 +61,7 @@ export namespace Entities{
         skipTheRest = true;
         break;
     }
+    
 
     if (!skipTheRest){
       switch(entity.direction){
@@ -98,18 +99,18 @@ export namespace Entities{
     direction: Direction;
     hitpoints: number;
 
+    // The number of frames that the entity has been in its current state for.
     state: EntityState;
+    prevState: EntityState;
+    stateFrameCount: number;
+
     armed? = true;
 
     prevAnimationId: string;
-    // Local frame count for actions such as attacking, WTF TO DO WITH THIS?
-    frameCount: number;
 
     attackBox: Rect;
 
     constructor(camera: Camera, playerMap: any, playerSheet: Assets.Spritesheet){
-
-      
       const worldPos = playerMap.spawnPos;
 
       this.id = 'player0';
@@ -117,7 +118,9 @@ export namespace Entities{
       this.world = { x: worldPos.x, y: worldPos.y };
       this.velocity = { x: 0, y: 0 };
       this.indoors = false;
+      this.prevState = EntityState.Idle;
       this.state = EntityState.Idle;
+      this.stateFrameCount = 0;
       this.direction = Direction.South;
 
       const archetype = Assets.store.archetypes[this.archetypeId];
@@ -139,7 +142,7 @@ export namespace Entities{
       let stopped = false;
 
       this.direction = moveDirection;
-      this.state = EntityState.Walk;
+      this.changeState(EntityState.Walk);
 
       switch (this.direction){
         case Direction.North:
@@ -160,23 +163,35 @@ export namespace Entities{
     stop(): void {
       this.velocity.x = 0;
       this.velocity.y = 0;
-      this.state = EntityState.Idle;
+      this.changeState(EntityState.Idle);
     }
 
     update(worldBounds: Vector, collisionBoxes: Rect[]): void {
-
-      if (this.state === EntityState.Attack){
-        this.frameCount++;
-
-        if (this.frameCount > 20){
-          this.frameCount = 0;
-          this.state = EntityState.Idle;
-        }
-
-        return;
+      switch(this.state){
+        case EntityState.Idle:
+          break;
+        case EntityState.Walk:
+          this.updateWorldPos(worldBounds, collisionBoxes)
+          break;
+        case EntityState.Attack:
+          if (this.stateFrameCount >= 20){      // @TODO: Hardcoded max frames for action/ state
+            this.changeState(EntityState.Idle);
+          }
+          break;
+        case EntityState.Hurt:
+          if (this.stateFrameCount >= 20){
+            this.changeState(EntityState.Idle);
+          }
+          break;
+        case EntityState.Down:
+          // Do nothing if entity down.
+          break;
       }
 
+      this.stateFrameCount++;
+    }
 
+    updateWorldPos(worldBounds: Vector, collisionBoxes: Rect[]): void {
       // Check world bounds
       if (this.velocity.x < 0 && this.world.x <= 0){
         this.velocity.x = 0;
@@ -237,8 +252,26 @@ export namespace Entities{
     }
 
     attack(): void {
-      this.frameCount = 0;
-      this.state = EntityState.Attack;
+      this.changeState(EntityState.Attack);
+    }
+
+    hurt(dmgVal: number): void {
+      if (this.state === EntityState.Down){
+        return;
+      }
+
+      this.changeState(EntityState.Hurt);
+      this.hitpoints -= dmgVal;
+      if (this.hitpoints <= 0){
+        this.hitpoints = 0;
+        this.changeState(EntityState.Down);
+      }
+    }
+
+    changeState(state: EntityState){
+      this.stateFrameCount = 0;
+      this.prevState = this.state;
+      this.state = state;
     }
   }
 

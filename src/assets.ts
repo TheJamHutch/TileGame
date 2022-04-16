@@ -11,7 +11,7 @@ export namespace Assets{
 
   const assetFiles = {
     textures: ['basetiles', 'overtiles', 'villager', 'slime', 'player'],
-    maps: ['wretch', 'tesst', 'small', 'rev', 'empty'],
+    maps: ['wretch', 'tesst', 'small', 'rev', 'empty', 'newone'],
     tilesheets: ['basetiles', 'toptiles' ],
     spritesheets: ['player', 'slime', 'villager'],
     data: ['archetypes']
