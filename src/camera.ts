@@ -98,10 +98,12 @@ export class Camera{
   }
 }
 
-export function worldToView(camera: Camera, world: Vector): Vector {
+export function worldToView(camera: Camera, world: Rect): Rect {
   // @TODO: Clamp offscreen values to just outside the view???
-  return {
+  return new Rect({
     x: camera.view.x + (world.x - camera.world.x),
-    y: camera.view.y + (world.y - camera.world.y)
-  };
+    y: camera.view.y + (world.y - camera.world.y),
+    w: world.w,
+    h: world.h
+  });
 }

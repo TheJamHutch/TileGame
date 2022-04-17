@@ -97,7 +97,7 @@ export namespace Game{
     state.config = config;
 
     // Init Day-Night cycle.
-    state.timeOfDay = new TimeOfDay({ minutes: 12, seconds: 0 });
+    state.timeOfDay = new TimeOfDay({ minutes: 11, seconds: 59 });
     setInterval(() => {
       state.timeOfDay.increment();
       
@@ -128,15 +128,6 @@ export namespace Game{
           break;
         case 'Space':
           state.player.attack();
-          for (let npc of state.npcs){
-            let entityWorld = new Rect({ x: npc.world.x, y: npc.world.y, w: npc.view.w, h: npc.view.h });
-            if (Entities.checkCollision(state.player.attackBox, entityWorld)){
-              npc.hurt(10);
-            }
-          }
-          break;
-        case 'Digit1':
-          state.player.hurt(20);
           break;
       }
     } else if (state.keyboardState === 'keyup'){
@@ -175,14 +166,33 @@ export namespace Game{
 
     state.camera.update(state.player);
 
-    state.player.update(state.tilemap.resolution, collisionBoxes);
 
-    playerOnEffectTile(viewTiles);
-
-    // Update all NPCS
+    // Update all NPCS 
     for (let npc of state.npcs){
+      
+      if (state.player.action === Entities.EntityAction.Attacking){
+        if (Entities.checkCollision(state.player.attackBox, npc.world)){
+          npc.hurt(10);
+        }
+      } else {
+        if (Entities.checkCollision(state.player.area, npc.world)){
+          if (npc.state === Entities.EntityState.Walk){
+            npc.prevState = Entities.EntityState.Walk;
+            npc.state = Entities.EntityState.Idle;
+          }
+        } else {
+          if (npc.prevState === Entities.EntityState.Walk){
+            npc.state = Entities.EntityState.Walk;
+          }
+        }
+      }
+
       npc.update();
     }
+
+    // @TODO: Currently must update entities
+    state.player.update(state.tilemap.resolution, collisionBoxes);
+    playerOnEffectTile(viewTiles);
   
     // Update view position for all entities including player
     // @TODO: Only update view pos of entities that are actually in view (or near to it so that offscreen entities can enter the view).
@@ -325,8 +335,8 @@ export namespace Game{
       Rendering.renderSprite(texture, entity);
     }
   
-    //renderCollisionMesh();
     renderTimeOfDayOverlay();
+    renderCollisionMesh();
 
 
     Rendering.setDrawColor('yellow');
@@ -384,6 +394,8 @@ export namespace Game{
     for (let entity of allEntities()){
       Rendering.strokeRect(entity.view);
     }
+
+    Rendering.strokeRect(worldToView(state.camera, state.player.area));
 
     const atkBox = state.player.attackBox;
     const view = worldToView(state.camera, atkBox);

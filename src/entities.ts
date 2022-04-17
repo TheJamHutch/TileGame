@@ -13,12 +13,19 @@ export namespace Entities{
     West
   };
 
-  enum EntityState{
+  export enum EntityState{
     Idle,
     Walk,
     Attack,
     Hurt,
     Down
+  }
+
+  export enum EntityAction{
+    Idle,
+    Walking,
+    Attacking,
+    Hurting
   }
 
   enum MovementPattern{
@@ -92,17 +99,20 @@ export namespace Entities{
     clip: Rect;
     view: Rect;
     world: Rect;
+    area: Rect;
     velocity: Vector;
     moveSpeed: number;
     indoors: boolean;
     direction: Direction;
     hitpoints: number;
 
+    action: EntityAction;
+    prevAction: EntityAction;
+
     // The number of frames that the entity has been in its current state for.
     state: EntityState;
     prevState: EntityState;
     stateFrameCount: number;
-
     armed? = true;
 
     prevAnimationId: string;
@@ -119,6 +129,8 @@ export namespace Entities{
       this.stateFrameCount = 0;
       this.direction = Direction.South;
 
+      this.prevAction = this.action = EntityAction.Idle;
+
       const archetype = Assets.store.archetypes[this.archetypeId];
       this.moveSpeed = archetype.moveSpeed;
       this.hitpoints = archetype.hitpoints;
@@ -133,6 +145,12 @@ export namespace Entities{
       this.world = new Rect({ x: worldPos.x, y: worldPos.y, w: spriteSize.x, h: spriteSize.y });
       this.clip = new Rect({ x: 0, y: 0, w: playerSheet.clipSize.x, h: playerSheet.clipSize.y });
       this.view = new Rect({ x: viewPos.x, y: viewPos.y, w: spriteSize.x, h: spriteSize.y });
+      this.area = new Rect({ 
+        x: this.world.x - this.view.w, 
+        y: this.world.y - this.view.h, 
+        w: (this.view.w * 3), 
+        h: (this.view.h * 3)
+      });
       this.attackBox = new Rect({ x: 0, y: 0, w: (this.view.w / 2), h: (this.view.h / 2) });
     }
 
@@ -165,6 +183,11 @@ export namespace Entities{
     }
 
     update(worldBounds: Vector, collisionBoxes: Rect[]): void {
+      // Actions only occur for one frame, therefore if any of them are set we need to set them back to none straight after.
+      if (this.action === EntityAction.Attacking){
+        this.action = EntityAction.Idle;
+      }
+
       switch(this.state){
         case EntityState.Idle:
           break;
@@ -206,6 +229,10 @@ export namespace Entities{
           break; 
       }
 
+      // Update player's area box
+      this.area.x = this.world.x - this.view.w; 
+      this.area.y = this.world.y - this.view.h;
+
       this.stateFrameCount++;
     }
 
@@ -243,6 +270,7 @@ export namespace Entities{
 
     attack(): void {
       this.changeState(EntityState.Attack);
+      this.changeAction(EntityAction.Attacking);
     }
 
     hurt(dmgVal: number): void {
@@ -256,6 +284,11 @@ export namespace Entities{
         this.hitpoints = 0;
         this.changeState(EntityState.Down);
       }
+    }
+
+    changeAction(action: EntityAction): void {
+      this.prevAction = this.action;
+      this.action = action;
     }
 
     changeState(state: EntityState){
@@ -277,6 +310,9 @@ export namespace Entities{
     state: EntityState;
     prevState: EntityState;
 
+    action: EntityAction;
+    prevAction: EntityAction;
+
     direction: Direction;
 
     movement = MovementPattern.Static;
@@ -297,6 +333,8 @@ export namespace Entities{
       this.prevState = EntityState.Idle;
       this.state = EntityState.Idle;
       this.direction = Direction.South;
+
+      this.prevAction = this.action = EntityAction.Idle;
 
       // Init rects
       const spriteSize = {
@@ -322,13 +360,25 @@ export namespace Entities{
         }
         this.nextNode = this.pathNodes[0];
         this.prevState = EntityState.Walk;
-        this.state = EntityState.Walk;
+        this.action = EntityAction.Walking;
       }
       this.nodeIdx = 0;
     }
 
     update(): void {
 
+      switch(this.action){
+        case EntityAction.Idle:
+          break;
+        case EntityAction.Walking:
+          this.movePath();
+          break;
+        case EntityAction.Hurting:
+          console.log('Ugh');
+          break;
+      }
+
+      /*
       switch(this.state){
         case EntityState.Idle:
           break;
@@ -351,7 +401,7 @@ export namespace Entities{
         case EntityState.Down:
           // Do nothing if entity down.
           break;
-      }
+      }*/
     }
 
     movePath(): void {
