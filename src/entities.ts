@@ -188,6 +188,26 @@ export namespace Entities{
           break;
       }
 
+      // Place attack box so that it is in front of player according to direction.
+      switch (this.direction){
+        case Direction.North:
+          this.attackBox.x = this.world.x + (this.view.h / 4);
+          this.attackBox.y = this.world.y - this.attackBox.h;
+          break; 
+        case Direction.East:
+          this.attackBox.x = this.world.x + this.view.w;
+          this.attackBox.y = this.world.y + (this.view.h / 4);
+          break; 
+        case Direction.South:
+          this.attackBox.x = this.world.x + (this.view.h / 4);
+          this.attackBox.y = this.world.y + this.view.h;
+          break; 
+        case Direction.West:
+          this.attackBox.x = this.world.x - this.attackBox.w;
+          this.attackBox.y = this.world.y + (this.view.h / 4);
+          break; 
+      }
+
       this.stateFrameCount++;
     }
 
@@ -229,26 +249,6 @@ export namespace Entities{
       
       this.world.x += this.velocity.x * this.moveSpeed;
       this.world.y += this.velocity.y * this.moveSpeed;
-
-      // Place attack box so that it is in front of player according to direction.
-      switch (this.direction){
-        case Direction.North:
-          this.attackBox.x = this.world.x + (this.view.h / 4);
-          this.attackBox.y = this.world.y - this.attackBox.h;
-          break; 
-        case Direction.East:
-          this.attackBox.x = this.world.x + this.view.w;
-          this.attackBox.y = this.world.y + (this.view.h / 4);
-          break; 
-        case Direction.South:
-          this.attackBox.x = this.world.x + (this.view.h / 4);
-          this.attackBox.y = this.world.y + this.view.h;
-          break; 
-        case Direction.West:
-          this.attackBox.x = this.world.x - this.attackBox.w;
-          this.attackBox.y = this.world.y + (this.view.h / 4);
-          break; 
-      }
     }
 
     attack(): void {

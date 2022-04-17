@@ -39,7 +39,8 @@ export namespace Tiling{
       this.layers = [];
 
       for (let layer of tilemap.layers){
-        this.layers.push(new TilemapLayer(layer, this.dimensions));
+        let tilesheet = Assets.store.tilesheets[layer.tilesheetId];
+        this.layers.push(new TilemapLayer(layer.tiles, tilesheet, this.dimensions));
         this.topLayerIdx++;
       }
   
@@ -100,25 +101,25 @@ export namespace Tiling{
   }
   
   export class TilemapLayer{
-    tilesheetId: any;
+    tilesheet: Assets.Tilesheet;
     tiles: number[];
     hiddenTiles: any[];
   
-    constructor(layer: { tilesheetId: string, tiles: number[] }, dimensions: Vector){
-      this.tilesheetId = layer.tilesheetId;
+    constructor(tiles: number[], tilesheet: Assets.Tilesheet, dimensions: Vector){
+      this.tilesheet = tilesheet;
       this.tiles = [];
       this.hiddenTiles = [];
   
       const nTiles = dimensions.x * dimensions.y;
       for (let i = 0; i < nTiles; i++)
       {
-        if (!layer.tiles || layer.tiles.length === 0){
+        if (!tiles || tiles.length === 0){
           this.tiles[i] = -1;
           continue;
         }
           
-        if (layer.tiles[i] !== undefined){
-          this.tiles[i] = layer.tiles[i];
+        if (tiles[i] !== undefined){
+          this.tiles[i] = tiles[i];
         }
       }
     }
@@ -152,9 +153,8 @@ export namespace Tiling{
           if (layer.tiles[tileIdx] > -1 && !tilemap.isTileHidden(tileIdx, i)){
           
             const tileType = layer.tiles[tileIdx];
-            const tilesheet = Assets.store.tilesheets[layer.tilesheetId];
-            const solid = (tilesheet.solidMap[tileType] === 1) ? true : false;
-            const effect = tilesheet.effectMap[tileType];
+            const solid = (layer.tilesheet.solidMap[tileType] === 1) ? true : false;
+            const effect = layer.tilesheet.effectMap[tileType];
             const tile = {
               pos: { x, y },
               solid,
@@ -205,19 +205,18 @@ export namespace Tiling{
           const tileType = layer.tiles[tileIdx];
 
           if (tileType > -1 && !tilemap.isTileHidden(tileIdx, i)){
-            const sheet = Assets.store.tilesheets[layer.tilesheetId];
-            const texture = Assets.store.textures[sheet.textureId];
+            const texture = Assets.store.textures[layer.tilesheet.textureId];
 
-            let clip = setClip(tileType, sheet.clipSize, sheet.dimensions);
+            let clip = setClip(tileType, layer.tilesheet.clipSize, layer.tilesheet.dimensions);
 
             // Overwrite clip if tile is animated
-            const tileIsAnimated = (sheet.animatedMap[tileType] === 1);
+            const tileIsAnimated = (layer.tilesheet.animatedMap[tileType] === 1);
             if (tileIsAnimated){
               // Find the correct animation to use from the tilesheet.
-              let animation = sheet.tileAnimations.find((anims: any) => anims.id === tileType);
+              let animation = layer.tilesheet.tileAnimations.find((anims: any) => anims.id === tileType); // @TODO: This seems to work but probably shouldnt, tileAnimations is a map not an array
               let animIdx = Math.floor(((frameCount / animation.speed) % animation.frames.length));
               let idx = animation.frames[animIdx];
-              clip = setClip(idx, sheet.clipSize, sheet.dimensions);
+              clip = setClip(idx, layer.tilesheet.clipSize, layer.tilesheet.dimensions);
             }
             
             const view = new Rect({ x: 0, y: 0, w: tilemap.tileSize, h: tilemap.tileSize });
@@ -260,13 +259,12 @@ export namespace Tiling{
     let tile = {} as any;
     let layerIdx = 0;
     for (let layer of tilemap.layers){
-      const sheet = Assets.store.tilesheets[layer.tilesheetId];
       const rawTile = layer.tiles[tileIdx];
       if (rawTile > -1){
         tile = {
           pos: tilePos,
-          solid: sheet.solidMap[rawTile],
-          effect: sheet.effectMap[rawTile],
+          solid: layer.tilesheet.solidMap[rawTile],
+          effect: layer.tilesheet.effectMap[rawTile],
           topLayerIdx: layerIdx
         };
       }
