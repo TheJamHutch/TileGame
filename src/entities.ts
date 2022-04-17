@@ -3,7 +3,6 @@ import { Camera, worldToView } from './camera';
 import { Rect, Vector } from './primitives';
 import { Rendering } from './rendering';
 import { Sprite, animateSprite } from './sprites';
-import { Tiling } from './tilemap';
 
 export namespace Entities{
   export enum Direction {
@@ -92,7 +91,7 @@ export namespace Entities{
     archetypeId: string;
     clip: Rect;
     view: Rect;
-    world: Vector;
+    world: Rect;
     velocity: Vector;
     moveSpeed: number;
     indoors: boolean;
@@ -111,11 +110,8 @@ export namespace Entities{
     attackBox: Rect;
 
     constructor(camera: Camera, playerMap: any, playerSheet: Assets.Spritesheet){
-      const worldPos = playerMap.spawnPos;
-
       this.id = 'player0';
       this.archetypeId = 'player';
-      this.world = { x: worldPos.x, y: worldPos.y };
       this.velocity = { x: 0, y: 0 };
       this.indoors = false;
       this.prevState = EntityState.Idle;
@@ -128,11 +124,13 @@ export namespace Entities{
       this.hitpoints = archetype.hitpoints;
 
       // Init rects
+      const worldPos = playerMap.spawnPos;
+      const viewPos = worldToView(camera, worldPos);
       const spriteSize = {
         x: playerSheet.clipSize.x * playerSheet.scaleFactor,
         y: playerSheet.clipSize.y * playerSheet.scaleFactor
       };
-      const viewPos = worldToView(camera, worldPos);
+      this.world = new Rect({ x: worldPos.x, y: worldPos.y, w: spriteSize.x, h: spriteSize.y });
       this.clip = new Rect({ x: 0, y: 0, w: playerSheet.clipSize.x, h: playerSheet.clipSize.y });
       this.view = new Rect({ x: viewPos.x, y: viewPos.y, w: spriteSize.x, h: spriteSize.y });
       this.attackBox = new Rect({ x: 0, y: 0, w: (this.view.w / 2), h: (this.view.h / 2) });
@@ -223,18 +221,10 @@ export namespace Entities{
       } else if (this.velocity.y > 0 && (this.world.y + this.view.h > worldBounds.y)){
         this.velocity.y = 0;
       }
-    
-      const easing = 5;
-      const worldRect = new Rect({
-        x: this.world.x + easing,
-        y: this.world.y + easing,
-        w: this.view.w - easing,
-        h: this.view.h - easing
-      });
-      
+
       // Check box collision
       for (let box of collisionBoxes) {
-        let collideDir = checkCollision(worldRect, box);
+        let collideDir = checkCollision(this.world, box);
         if (this.velocity.x > 0 && collideDir === Direction.East){
           this.velocity.x = 0;
         } else if (this.velocity.x < 0 && collideDir === Direction.West){
@@ -301,23 +291,23 @@ export namespace Entities{
     frameCount = 0;
 
     constructor(camera: Camera, entityMap: any, entitySheet: Assets.Spritesheet){
+      this.id = 'villager0';
+      this.archetypeId = entityMap.archetypeId;
+      this.velocity = { x: 0, y: 0 };
+      this.prevState = EntityState.Idle;
+      this.state = EntityState.Idle;
+      this.direction = Direction.South;
 
+      // Init rects
       const spriteSize = {
         x: entitySheet.clipSize.x * entitySheet.scaleFactor,
         y: entitySheet.clipSize.y * entitySheet.scaleFactor
       };
       const worldPos = entityMap.spawnPos;
       const viewPos = worldToView(camera, worldPos);
-
-      this.id = 'villager0';
-      this.archetypeId = entityMap.archetypeId;
       this.clip = new Rect({ x: 0, y: 0, w: entitySheet.clipSize.x, h: entitySheet.clipSize.y });
       this.view = new Rect({ x: viewPos.x, y: viewPos.y, w: spriteSize.x, h: spriteSize.y });
-      this.world = { x: worldPos.x, y: worldPos.y };
-      this.velocity = { x: 0, y: 0 };
-      this.prevState = EntityState.Idle;
-      this.state = EntityState.Idle;
-      this.direction = Direction.South;
+      this.world = new Rect({ x: worldPos.x, y: worldPos.y, w: spriteSize.x, h: spriteSize.y });
 
       const archetype = Assets.store.archetypes[this.archetypeId];
       this.moveSpeed = archetype.moveSpeed;

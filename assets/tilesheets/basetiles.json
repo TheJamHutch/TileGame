@@ -38,7 +38,7 @@
     "tileAnimations": [
       {
         "id": 36,
-        "speed": 50,
+        "speed": 30,
         "frames": [ 36, 60, 61 ]
       }
     ]

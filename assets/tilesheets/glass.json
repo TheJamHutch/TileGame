@@ -1,0 +1,17 @@
+{
+    "id": "glass",
+    "name": "glass",
+    "type": "tilesheet",
+    "textureId": "glass",
+    "clipSize": 16,
+    "dimensions": { "x": 1, "y": 1 },
+    "solidMap": [
+      0
+    ],
+    "effectMap": [
+      0
+    ],
+    "animatedMap": [
+      0
+    ]
+  }

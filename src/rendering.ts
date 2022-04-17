@@ -66,8 +66,8 @@ export namespace Rendering{
       dst.x, dst.y, dst.w, dst.h)
   }
   
-  export function renderText(text: string, pos: Vector){
-    state.context.font = '24px myfont';
+  export function renderText(text: string, size:number, pos: Vector){
+    state.context.font = `${size}px myfont`;
     state.context.fillText(text, pos.x, pos.y);
   }
 

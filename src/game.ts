@@ -9,6 +9,57 @@ import { Assets } from './assets';
 import * as _ from 'lodash';
 
 export namespace Game{
+
+  // Each map layer has a specific, hardcoded purpose.
+  enum MapLayer{
+    Terrain,  // Grass, sand, water etc.
+    Scenery,  // Trees, rocks, interior decorations (i.e. tables)
+    Glass,    // Windows and windowed doors. These light up at night.
+    Roof      // Roof and door tiles that disappear when the player walks inside.
+  }
+
+  /*
+  enum TimeOfDay{
+    Dawn = 0,
+    Morning,
+    Day,
+    Evening,
+    Dusk,
+    Night
+  };*/
+
+  class TimeOfDay{
+    readonly MAX_SECONDS = 59;
+    readonly MAX_MINUTES = 23;
+
+    minutes: number;
+    seconds: number;
+
+    constructor(tod: { minutes: number, seconds: number }){
+      this.minutes = tod.minutes;
+      this.seconds = tod.seconds;
+    }
+
+    increment(): void {
+      this.seconds += 1;
+      if (this.seconds > this.MAX_SECONDS){
+        this.minutes++;
+        this.seconds = 0;
+      }
+
+      if (this.minutes > this.MAX_MINUTES){
+        this.minutes = 0;
+      }
+    }
+
+    toString(): string {
+      let minPrefix = (this.minutes < 10) ? '0' : '';
+      let secPrefix = (this.seconds < 10) ? '0' : '';
+
+      return `${minPrefix}${this.minutes}:${secPrefix}${this.seconds}`;
+    }
+  }
+
   export let keyDown: string;
 
   const state = {} as any;
@@ -45,7 +96,19 @@ export namespace Game{
 
     state.config = config;
 
-    console.log(state.prevMapId, state.mapId);
+    // Init Day-Night cycle.
+    state.timeOfDay = new TimeOfDay({ minutes: 12, seconds: 0 });
+    setInterval(() => {
+      state.timeOfDay.increment();
+      
+      if (state.tilemap.layers.length >= MapLayer.Glass){
+        if (state.timeOfDay.minutes > 19  || state.timeOfDay.minutes < 5){
+          state.tilemap.layers[MapLayer.Glass].tilesheet.textureId = 'glass_night';
+        } else {
+          state.tilemap.layers[MapLayer.Glass].tilesheet.textureId = 'glass';
+        }
+      }
+    }, 1000);
   }
 
   function handleKeypress(): void {
@@ -106,17 +169,11 @@ export namespace Game{
     }
     // Solid entities
     for (let entity of state.npcs){
-      const worldRect = new Rect({
-        x: entity.world.x,
-        y: entity.world.y,
-        w: entity.view.w,
-        h: entity.view.h
-      });
-      collisionBoxes.push(worldRect);
+      collisionBoxes.push(entity.world);
     }
 
-    
-    state.camera.update(state.player, state.tilemap.resolution);
+
+    state.camera.update(state.player);
 
     state.player.update(state.tilemap.resolution, collisionBoxes);
 
@@ -177,7 +234,7 @@ export namespace Game{
     
     if (state.player.indoors){
       if (playerTile.effect != Tiling.TileEffect.Door && playerTile.effect != Tiling.TileEffect.Roof){
-        state.tilemap.clearHiddenTiles(); // @TODO: Clear hiddent tiles for a specific layer? (Currently all layers)
+        state.tilemap.clearHiddenTiles(); // @TODO: Clear hidden tiles for a specific layer? (Currently all layers)
         state.player.indoors = false;
       }
     } else {
@@ -268,7 +325,50 @@ export namespace Game{
       Rendering.renderSprite(texture, entity);
     }
   
-    renderCollisionMesh();
+    //renderCollisionMesh();
+    renderTimeOfDayOverlay();
+
+
+    Rendering.setDrawColor('yellow');
+    Rendering.renderText(state.timeOfDay.toString(), 48, { x: 1180, y: 40 });
+  }
+  
+  function renderTimeOfDayOverlay(): void {
+    let opacity = 0.1;
+    let color = '';
+
+    // @TODO: Move to enum?
+    const SUNRISE = 3;
+    const DAYBREAK = 9;
+    const SUNSET = 18;
+    const NIGHTBREAK = 22;
+
+    const mins = state.timeOfDay.minutes;
+    const morning = (mins >= SUNRISE && mins < DAYBREAK);
+    const daytime = (mins >= DAYBREAK && mins < SUNSET);
+    const evening = (mins >= SUNSET && mins < NIGHTBREAK);
+
+    if (daytime){
+      return;
+    } else if (morning){
+      color = '#050000';
+      opacity = ((DAYBREAK - mins) * 0.05);
+    } else if (evening){
+      color = '#000044';
+      opacity = ((mins - SUNSET) * 0.1) + 0.1;
+    } else {
+      color = '#000022';
+      opacity = 0.6;
+    }
+
+    const mapRect = new Rect({ 
+      x: state.camera.view.x, 
+      y: state.camera.view.y, 
+      w: state.tilemap.resolution.x,
+      h: state.tilemap.resolution.y 
+    });
+    Rendering.setDrawColor(color);
+    Rendering.fillRect(mapRect, opacity);
   }
 
   function renderCollisionMesh(){

@@ -39,6 +39,7 @@ export namespace Tiling{
       this.layers = [];
 
       for (let layer of tilemap.layers){
+        
         let tilesheet = Assets.store.tilesheets[layer.tilesheetId];
         this.layers.push(new TilemapLayer(layer.tiles, tilesheet, this.dimensions));
         this.topLayerIdx++;
