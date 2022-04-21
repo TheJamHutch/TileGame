@@ -9,6 +9,7 @@
         "hitpoints": 50,
         "hostile": false,
         "reasonable": true,
+        "flees": true,
         "movement": "path",
         "moveSpeed": 1
     },

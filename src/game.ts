@@ -12,10 +12,10 @@ export namespace Game{
 
   // Each map layer has a specific, hardcoded purpose.
   enum MapLayer{
-    Terrain,  // Grass, sand, water etc.
-    Scenery,  // Trees, rocks, interior decorations (i.e. tables)
-    Glass,    // Windows and windowed doors. These light up at night.
-    Roof      // Roof and door tiles that disappear when the player walks inside.
+    Terrain = 0,  // Grass, sand, water etc.
+    Scenery,      // Trees, rocks, interior decorations (i.e. tables)
+    Glass,        // Windows and windowed doors. These light up at night.
+    Roof          // Roof and door tiles that disappear when the player walks inside.
   }
 
   /*
@@ -101,13 +101,13 @@ export namespace Game{
     setInterval(() => {
       state.timeOfDay.increment();
       
-      if (state.tilemap.layers.length >= MapLayer.Glass){
+      /*
         if (state.timeOfDay.minutes > 19  || state.timeOfDay.minutes < 5){
-          state.tilemap.layers[MapLayer.Glass].tilesheet.textureId = 'glass_night';
+          state.tilemap.layers[2].tilesheet.textureId = 'glass_night';
         } else {
-          state.tilemap.layers[MapLayer.Glass].tilesheet.textureId = 'glass';
+          state.tilemap.layers[2].tilesheet.textureId = 'glass';
         }
-      }
+        */
     }, 1000);
   }
 
@@ -128,6 +128,8 @@ export namespace Game{
           break;
         case 'Space':
           state.player.attack();
+          console.log(state.tilemap);
+          
           break;
       }
     } else if (state.keyboardState === 'keyup'){
@@ -166,33 +168,47 @@ export namespace Game{
 
     state.camera.update(state.player);
 
+    state.player.update(state.tilemap.resolution, collisionBoxes);
+    playerOnEffectTile(viewTiles);
+
 
     // Update all NPCS 
     for (let npc of state.npcs){
       
-      if (state.player.action === Entities.EntityAction.Attacking){
-        if (Entities.checkCollision(state.player.attackBox, npc.world)){
-          npc.hurt(10);
-        }
-      } else {
+      // If player is within range of the NPC
         if (Entities.checkCollision(state.player.area, npc.world)){
-          if (npc.state === Entities.EntityState.Walk){
-            npc.prevState = Entities.EntityState.Walk;
-            npc.state = Entities.EntityState.Idle;
+          npc.engaged = true;
+
+          if (Entities.checkCollision(state.player.attackBox, npc.world)){
+            if (state.player.attacking){
+              npc.hurt(10);
+              npc.hostile = true;
+            }
           }
+
+          // Entity faces player while engaged
+          let pc = { x: state.player.world.x + 32, y: state.player.world.y + 32 }; // Player center
+          if (pc.y < npc.world.top){
+            npc.direction = Entities.Direction.North;
+          } else if (pc.y > npc.world.bottom ){
+            npc.direction = Entities.Direction.South;
+          }
+
+          if (state.player.world.right < npc.world.left){
+            npc.direction = Entities.Direction.West;
+          } else if (state.player.world.left > npc.world.right){
+            npc.direction = Entities.Direction.East;
+          }
+
+        
         } else {
-          if (npc.prevState === Entities.EntityState.Walk){
-            npc.state = Entities.EntityState.Walk;
+          if (npc.engaged){
+            npc.engaged = false;
           }
         }
-      }
 
       npc.update();
     }
-
-    // @TODO: Currently must update entities
-    state.player.update(state.tilemap.resolution, collisionBoxes);
-    playerOnEffectTile(viewTiles);
   
     // Update view position for all entities including player
     // @TODO: Only update view pos of entities that are actually in view (or near to it so that offscreen entities can enter the view).

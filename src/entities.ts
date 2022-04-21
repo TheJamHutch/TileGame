@@ -21,13 +21,6 @@ export namespace Entities{
     Down
   }
 
-  export enum EntityAction{
-    Idle,
-    Walking,
-    Attacking,
-    Hurting
-  }
-
   enum MovementPattern{
     Static,
     Roam,
@@ -106,9 +99,6 @@ export namespace Entities{
     direction: Direction;
     hitpoints: number;
 
-    action: EntityAction;
-    prevAction: EntityAction;
-
     // The number of frames that the entity has been in its current state for.
     state: EntityState;
     prevState: EntityState;
@@ -117,6 +107,8 @@ export namespace Entities{
 
     prevAnimationId: string;
 
+    prevAttacking = false;
+    attacking: boolean = false;
     attackBox: Rect;
 
     constructor(camera: Camera, playerMap: any, playerSheet: Assets.Spritesheet){
@@ -128,8 +120,6 @@ export namespace Entities{
       this.state = EntityState.Idle;
       this.stateFrameCount = 0;
       this.direction = Direction.South;
-
-      this.prevAction = this.action = EntityAction.Idle;
 
       const archetype = Assets.store.archetypes[this.archetypeId];
       this.moveSpeed = archetype.moveSpeed;
@@ -183,9 +173,13 @@ export namespace Entities{
     }
 
     update(worldBounds: Vector, collisionBoxes: Rect[]): void {
-      // Actions only occur for one frame, therefore if any of them are set we need to set them back to none straight after.
-      if (this.action === EntityAction.Attacking){
-        this.action = EntityAction.Idle;
+
+      if (this.prevAttacking){
+        this.attacking = false;
+        this.prevAttacking = false;
+      }
+      if (this.attacking){
+        this.prevAttacking = true;
       }
 
       switch(this.state){
@@ -269,8 +263,8 @@ export namespace Entities{
     }
 
     attack(): void {
+      this.attacking = true;
       this.changeState(EntityState.Attack);
-      this.changeAction(EntityAction.Attacking);
     }
 
     hurt(dmgVal: number): void {
@@ -284,11 +278,6 @@ export namespace Entities{
         this.hitpoints = 0;
         this.changeState(EntityState.Down);
       }
-    }
-
-    changeAction(action: EntityAction): void {
-      this.prevAction = this.action;
-      this.action = action;
     }
 
     changeState(state: EntityState){
@@ -310,9 +299,6 @@ export namespace Entities{
     state: EntityState;
     prevState: EntityState;
 
-    action: EntityAction;
-    prevAction: EntityAction;
-
     direction: Direction;
 
     movement = MovementPattern.Static;
@@ -326,6 +312,17 @@ export namespace Entities{
     // Local frame count
     frameCount = 0;
 
+    walking = false;
+    walks = false;
+
+    hurting = false;
+
+    archetype: any;
+    engaged = false;
+    prevEngaged = false;
+
+    hostile = false;
+
     constructor(camera: Camera, entityMap: any, entitySheet: Assets.Spritesheet){
       this.id = 'villager0';
       this.archetypeId = entityMap.archetypeId;
@@ -334,7 +331,7 @@ export namespace Entities{
       this.state = EntityState.Idle;
       this.direction = Direction.South;
 
-      this.prevAction = this.action = EntityAction.Idle;
+      this.archetype = Assets.store.archetypes[this.archetypeId];
 
       // Init rects
       const spriteSize = {
@@ -359,49 +356,75 @@ export namespace Entities{
           this.pathNodes.push(node);
         }
         this.nextNode = this.pathNodes[0];
+        this.state = EntityState.Walk;
         this.prevState = EntityState.Walk;
-        this.action = EntityAction.Walking;
+        this.walks = true;
       }
       this.nodeIdx = 0;
+
+      if (this.walks){
+        this.walking = true;
+      }
     }
 
     update(): void {
 
-      switch(this.action){
-        case EntityAction.Idle:
-          break;
-        case EntityAction.Walking:
-          this.movePath();
-          break;
-        case EntityAction.Hurting:
-          console.log('Ugh');
-          break;
+      if (this.engaged){
+        this.prevEngaged = true;
+
+        // If ignore ...
+
+        if (this.archetype.reasonable){
+          this.state = EntityState.Idle;
+          this.walking = false;
+        }
+
+        if (this.archetype.hostile){
+
+        }
+
+        // If hostile ...
+
+  
+      } else {
+        if (this.prevEngaged){
+          this.prevEngaged = false;
+
+          if (this.walks){
+            this.walking = true;
+          }
+        }
       }
 
-      /*
+      if (this.hurting){
+        this.frameCount++;
+        if (this.frameCount > 20){
+          this.frameCount = 0;
+          this.hurting = false;
+        }
+        this.state = EntityState.Hurt;
+      } else if (this.walking){
+        this.state = EntityState.Walk;
+        if (this.movement === MovementPattern.Path){
+          this.movePath();
+        }
+      }
+
+      
+
       switch(this.state){
         case EntityState.Idle:
           break;
         case EntityState.Walk:
-          if (this.movement === MovementPattern.Roam){
-        
-          } else if (this.movement === MovementPattern.Path){
-            this.movePath();
-          }
           break;
         case EntityState.Attack:
           break;
         case EntityState.Hurt:
-          this.frameCount++;
-          if (this.frameCount > 20){
-            this.frameCount = 0;
-            this.changeState(this.prevState);
-          }
           break;
         case EntityState.Down:
           // Do nothing if entity down.
           break;
-      }*/
+      }
     }
 
     movePath(): void {
@@ -450,17 +473,12 @@ export namespace Entities{
         return;
       }
 
-      this.changeState(EntityState.Hurt);
+      this.hurting = true;
       this.hitpoints -= dmgVal;
       if (this.hitpoints <= 0){
         this.hitpoints = 0;
-        this.changeState(EntityState.Down);
+        this.state = EntityState.Down;
       }
-    }
-
-    changeState(state: EntityState){
-      this.prevState = this.state;
-      this.state = state;
     }
   }
 
