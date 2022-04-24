@@ -306,7 +306,7 @@ export namespace Entities{
     nextNode?: Vector;
     nodeIdx: number;
     reverse: boolean = false;
-
+    armed = false;
     hitpoints: number;
 
     // Local frame count
@@ -323,6 +323,8 @@ export namespace Entities{
 
     hostile = false;
 
+    attackBox: Rect;
+
     constructor(camera: Camera, entityMap: any, entitySheet: Assets.Spritesheet){
       this.id = 'villager0';
       this.archetypeId = entityMap.archetypeId;
@@ -331,7 +333,13 @@ export namespace Entities{
       this.state = EntityState.Idle;
       this.direction = Direction.South;
 
+      // Init archetype
       this.archetype = Assets.store.archetypes[this.archetypeId];
+      this.moveSpeed = this.archetype.moveSpeed;
+      this.hitpoints = this.archetype.hitpoints;
+      if (this.archetype.armed){
+        this.armed = this.archetype.armed;
+      }
 
       // Init rects
       const spriteSize = {
@@ -343,10 +351,7 @@ export namespace Entities{
       this.clip = new Rect({ x: 0, y: 0, w: entitySheet.clipSize.x, h: entitySheet.clipSize.y });
       this.view = new Rect({ x: viewPos.x, y: viewPos.y, w: spriteSize.x, h: spriteSize.y });
       this.world = new Rect({ x: worldPos.x, y: worldPos.y, w: spriteSize.x, h: spriteSize.y });
-
-      const archetype = Assets.store.archetypes[this.archetypeId];
-      this.moveSpeed = archetype.moveSpeed;
-      this.hitpoints = archetype.hitpoints;
+      this.attackBox = new Rect({ x: 0, y: 0, w: (this.view.w / 2), h: (this.view.h / 2) });
 
       // Init path stuff
       this.pathNodes = [];
@@ -424,6 +429,25 @@ export namespace Entities{
         case EntityState.Down:
           // Do nothing if entity down.
           break;
+      }
+
+      switch (this.direction){
+        case Direction.North:
+          this.attackBox.x = this.world.x + (this.view.h / 4);
+          this.attackBox.y = this.world.y - this.attackBox.h;
+          break; 
+        case Direction.East:
+          this.attackBox.x = this.world.x + this.view.w;
+          this.attackBox.y = this.world.y + (this.view.h / 4);
+          break; 
+        case Direction.South:
+          this.attackBox.x = this.world.x + (this.view.h / 4);
+          this.attackBox.y = this.world.y + this.view.h;
+          break; 
+        case Direction.West:
+          this.attackBox.x = this.world.x - this.attackBox.w;
+          this.attackBox.y = this.world.y + (this.view.h / 4);
+          break; 
       }
     }
 

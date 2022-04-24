@@ -313,9 +313,11 @@ export namespace Game{
 
     // Recreate game objects (camera, player, enemies)
     const playerArchetypeId = 'player';
+    // Copy the entities from map
     const playerIdx = map.entities.findIndex((entity: any) => entity.archetypeId === playerArchetypeId);
     let playerSheet = Assets.store.spritesheets[playerArchetypeId];
-    let playerMap = map.entities[playerIdx];
+    let playerMap = Object.assign({}, map.entities[playerIdx]);
+
     state.camera = new Camera(state.resolution, state.tilemap.resolution, playerWorld);
 
     // Override the player's spawn position in the map
@@ -323,12 +325,14 @@ export namespace Game{
     state.player = new Entities.Player(state.camera, playerMap, playerSheet);
 
     // Remove player from the list of map entities
-    map.entities.splice(playerIdx, 1);
+    //mapEntities.splice(playerIdx, 1);
 
     state.npcs = [];
     for (let rawEntity of map.entities){
-      let npc = new Entities.Npc(state.camera, rawEntity, Assets.store.spritesheets[rawEntity.archetypeId]);
-      state.npcs.push(npc);
+      if (rawEntity.archetypeId !== 'player'){
+        let npc = new Entities.Npc(state.camera, rawEntity, Assets.store.spritesheets[rawEntity.archetypeId]);
+        state.npcs.push(npc);
+      }
     }
 
     state.prevMapId = state.mapId;
@@ -352,7 +356,7 @@ export namespace Game{
     }
   
     renderTimeOfDayOverlay();
-    renderCollisionMesh();
+    //renderCollisionMesh();
 
 
     Rendering.setDrawColor('yellow');
@@ -409,15 +413,14 @@ export namespace Game{
 
     for (let entity of allEntities()){
       Rendering.strokeRect(entity.view);
+
+      const view = worldToView(state.camera, entity.attackBox);
+      entity.attackBox.x = view.x;
+      entity.attackBox.y = view.y;
+      Rendering.fillRect(entity.attackBox, 0.4);
     }
 
     Rendering.strokeRect(worldToView(state.camera, state.player.area));
-
-    const atkBox = state.player.attackBox;
-    const view = worldToView(state.camera, atkBox);
-    atkBox.x = view.x;
-    atkBox.y = view.y;
-    Rendering.fillRect(atkBox, 0.4);
   }
 
   function posToIndex(pos: Vector, dims: Vector): number{

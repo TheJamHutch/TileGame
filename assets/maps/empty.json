@@ -90024,23 +90024,18 @@
 		},
 		{
 			"archetypeId": "villager",
-			"spawnPos": { "x": 150, "y": 100 }
-		},
-		{
-			"archetypeId": "villager",
-			"spawnPos": { "x": 500, "y": 200 },
-			"pathNodes": [
-				{ "x": 100, "y": 200 },
-				{ "x": 100, "y": 300 },
-				{ "x": 300, "y": 300 }
-			]
-		},
-		{
-			"archetypeId": "villager",
 			"spawnPos": { "x": 650, "y": 300 },
 			"pathNodes": [
 				{ "x": 450, "y": 300 },
 				{ "x": 450, "y": 400 }
+			]
+		},
+		{
+			"archetypeId": "blackknight",
+			"spawnPos": { "x": 120, "y": 60 },
+			"pathNodes": [
+				{ "x": 120, "y": 60 },
+				{ "x": 120, "y": 650 }
 			]
 		}
 	]

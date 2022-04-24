@@ -48,7 +48,11 @@ $(async () => {
 
   // Bind app events to the corresponding DOM event or element.
   $(document).on('keydown', (e) => {
-    Game.onKeyDown(e.code);
+    if (e.code === 'KeyP'){
+      console.log('paused');
+    } else {
+      Game.onKeyDown(e.code);
+    }
   });
   $(document).on('keyup', (e) => {
     Game.onKeyUp(e.code);

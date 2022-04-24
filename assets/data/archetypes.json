@@ -11,7 +11,8 @@
         "reasonable": true,
         "flees": true,
         "movement": "path",
-        "moveSpeed": 1
+        "moveSpeed": 1,
+        "armed": false
     },
     "guard": {
         "id": "guard",
@@ -27,5 +28,15 @@
         "reasonable": false,
         "movement": "roam",
         "range": 5
+    },
+    "blackknight": {
+        "id": "blackknight",
+        "hitpoints": 50,
+        "hostile": true,
+        "reasonable": true,
+        "flees": false,
+        "movement": "path",
+        "moveSpeed": 1,
+        "armed": true
     }
 }
