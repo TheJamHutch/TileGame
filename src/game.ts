@@ -187,7 +187,7 @@ export namespace Game{
           }
 
           // Entity faces player while engaged
-          let pc = { x: state.player.world.x + 32, y: state.player.world.y + 32 }; // Player center
+          let pc = state.player.world.centerAbsolute();
           if (pc.y < npc.world.top){
             npc.direction = Entities.Direction.North;
           } else if (pc.y > npc.world.bottom ){
@@ -402,10 +402,7 @@ export namespace Game{
   }
 
   function renderCollisionMesh(){
-    const viewCenter = {
-      x: state.resolution.x / 2,
-      y: state.resolution.y / 2
-    };
+    const viewCenter = state.camera.view.centerRelative();
 
     Rendering.setDrawColor('red');
     Rendering.renderLine({ x: 0, y: viewCenter.y }, { x: state.resolution.x, y: viewCenter.y });

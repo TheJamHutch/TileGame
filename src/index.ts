@@ -27,7 +27,7 @@ $(async () => {
   const initConfig = {
     resolution: { x: 1280, y: 1024 },
     initMapId: 'empty',
-    tileSize: 32 // @TODO: Should tileSize be specified here or in the tilesheet?
+    tileSize: 32
   };
 
   // Init canvas

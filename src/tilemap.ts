@@ -14,7 +14,14 @@ export namespace Tiling{
     Door,
     Roof
   }
-  
+
+  export enum TileSize {
+    Tiny = 8,
+    Small = 16,
+    Medium = 32,
+    Large = 64
+  }
+
   export type Tile = {
     pos: Vector;
     solid: boolean;
@@ -23,15 +30,15 @@ export namespace Tiling{
   };
   
   export class Tilemap{
-    // The original tile size before zoom
-    tileSize: number;
+    // The standard tile size before any zoom is applied
+    tileSize: TileSize;
     topLayerIdx: number;
     layers: TilemapLayer[];
     dimensions: Vector;
     resolution: Vector;
     transitionTiles: { idx: number, mapId: string }[];
   
-    constructor(tilemap: any, tileSize: number){
+    constructor(tilemap: any, tileSize: TileSize){
       this.tileSize = tileSize;
       this.topLayerIdx = -1;
       this.dimensions = tilemap.dimensions;
