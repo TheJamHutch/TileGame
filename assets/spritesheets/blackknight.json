@@ -1,0 +1,237 @@
+{
+    "id": "blackknight",
+    "dimensions": {
+      "x": 1,
+      "y": 1
+    },
+    "clipSize": {
+      "x": 32,
+      "y": 32
+    },
+    "scaleFactor": 2,
+    "animations": {
+      "idle.south": {
+        "speed": 100,
+        "frames": [
+          { "x": 0, "y": 0 },
+          { "x": 1, "y": 0 },
+          { "x": 0, "y": 0 },
+          { "x": 2, "y": 0 }
+        ]
+      },
+      "idle.east": {
+        "speed": 100,
+        "frames": [
+          { "x": 3, "y": 0 }
+        ]
+      },
+      "idle.west": {
+        "speed": 100,
+        "frames": [
+          { "x": 4, "y": 0 }
+        ]
+      },
+      "idle.north": {
+        "speed": 100,
+        "frames": [
+          { "x": 5, "y": 0 }
+        ]
+      },
+      "walk.south": {
+        "speed": 5,
+        "frames": [
+          { "x": 0, "y": 0 },
+          { "x": 6, "y": 0 },
+          { "x": 0, "y": 0 },
+          { "x": 7, "y": 0 }
+        ]
+      },
+      "walk.east": {
+        "speed": 5,
+        "frames": [
+          { "x": 3, "y": 0 },
+          { "x": 8, "y": 0 },
+          { "x": 3, "y": 0 },
+          { "x": 9, "y": 0 }
+        ]
+      },
+      "walk.west": {
+        "speed": 5,
+        "frames": [
+          { "x": 4, "y": 0 },
+          { "x": 0, "y": 1 },
+          { "x": 4, "y": 0 },
+          { "x": 1, "y": 1 }
+        ]
+      },
+      "walk.north": {
+        "speed": 5,
+        "frames": [
+          { "x": 5, "y": 0 },
+          { "x": 2, "y": 1 },
+          { "x": 5, "y": 0 },
+          { "x": 3, "y": 1 }
+        ]
+      },
+      "idle.south.armed": {
+        "speed": 100,
+        "frames": [
+          { "x": 4, "y": 1 },
+          { "x": 5, "y": 1 },
+          { "x": 4, "y": 1 },
+          { "x": 6, "y": 1 }
+        ]
+      },
+      "idle.east.armed": {
+        "speed": 100,
+        "frames": [
+          { "x": 7, "y": 1 }
+        ]
+      },
+      "idle.west.armed": {
+        "speed": 100,
+        "frames": [
+          { "x": 8, "y": 1 }
+        ]
+      },
+      "idle.north.armed": {
+        "speed": 100,
+        "frames": [
+          { "x": 9, "y": 1 }
+        ]
+      },
+      "walk.south.armed": {
+        "speed": 5,
+        "frames": [
+          { "x": 4, "y": 1 },
+          { "x": 0, "y": 2 },
+          { "x": 4, "y": 1 },
+          { "x": 1, "y": 2 }
+        ]
+      },
+      "walk.east.armed": {
+        "speed": 5,
+        "frames": [
+          { "x": 7, "y": 1 },
+          { "x": 2, "y": 2 },
+          { "x": 7, "y": 1 },
+          { "x": 3, "y": 2 }
+        ]
+      },
+      "walk.west.armed": {
+        "speed": 5,
+        "frames": [
+          { "x": 8, "y": 1 },
+          { "x": 4, "y": 2 },
+          { "x": 8, "y": 1 },
+          { "x": 5, "y": 2 }
+        ]
+      },
+      "walk.north.armed": {
+        "speed": 5,
+        "frames": [
+          { "x": 9, "y": 1 },
+          { "x": 6, "y": 2 },
+          { "x": 9, "y": 1 },
+          { "x": 7, "y": 2 }
+        ]
+      },
+      "attack.south.armed": {
+        "speed": 5,
+        "frames": [
+          { "x": 4, "y": 1 },
+          { "x": 8, "y": 2 },
+          { "x": 9, "y": 2 },
+          { "x": 0, "y": 3 },
+          { "x": 1, "y": 3 },
+          { "x": 2, "y": 3 },
+          { "x": 3, "y": 3 }
+        ]
+      },
+      "attack.east.armed": {
+        "speed": 5,
+        "frames": [
+          { "x": 4, "y": 3 },
+          { "x": 5, "y": 3 },
+          { "x": 6, "y": 3 },
+          { "x": 7, "y": 3 }
+        ]
+      },
+      "attack.west.armed": {
+        "speed": 5,
+        "frames": [
+          { "x": 4, "y": 4 },
+          { "x": 3, "y": 4 },
+          { "x": 2, "y": 4 },
+          { "x": 1, "y": 4 }
+        ]
+      },
+      "attack.north.armed": {
+        "speed": 5,
+        "frames": [
+          { "x": 9, "y": 1 },
+          { "x": 8, "y": 3 },
+          { "x": 9, "y": 3 },
+          { "x": 0, "y": 4 }
+        ]
+      },
+      "hurt.south.armed": {
+        "speed": 5,
+        "frames": [
+          { "x": 0, "y": 0 },
+          { "x": 5, "y": 4 },
+          { "x": 0, "y": 0 },
+          { "x": 5, "y": 4 },
+          { "x": 0, "y": 0 },
+          { "x": 5, "y": 4 },
+          { "x": 0, "y": 0 },
+          { "x": 5, "y": 4 }
+        ]
+      },
+      "hurt.east.armed": {
+        "speed": 5,
+        "frames": [
+          { "x": 3, "y": 0 },
+          { "x": 6, "y": 4 },
+          { "x": 3, "y": 0 },
+          { "x": 6, "y": 4 },
+          { "x": 3, "y": 0 },
+          { "x": 6, "y": 4 },
+          { "x": 3, "y": 0 },
+          { "x": 6, "y": 4 }
+        ]
+      },
+      "hurt.west.armed": {
+        "speed": 5,
+        "frames": [
+          { "x": 4, "y": 0 },
+          { "x": 7, "y": 4 },
+          { "x": 4, "y": 0 },
+          { "x": 7, "y": 4 },
+          { "x": 4, "y": 0 },
+          { "x": 7, "y": 4 },
+          { "x": 4, "y": 0 },
+          { "x": 7, "y": 4 }
+        ]
+      },
+      "hurt.north.armed": {
+        "speed": 5,
+        "frames": [
+          { "x": 5, "y": 0 },
+          { "x": 8, "y": 4 },
+          { "x": 5, "y": 0 },
+          { "x": 8, "y": 4 },
+          { "x": 5, "y": 0 },
+          { "x": 8, "y": 4 },
+          { "x": 5, "y": 0 },
+          { "x": 8, "y": 4 }
+        ]
+      },
+      "down": {
+        "speed": 1,
+        "frames": [
+          { "x": 9, "y": 4 }
+        ]
+      }
+    }
+}

@@ -1,0 +1,20 @@
+{
+  "id": "toptiles",
+  "name": "toptiles",
+  "type": "tilesheet",
+  "textureId": "overtiles",
+  "clipSize": 16,
+  "dimensions": { "x": 2, "y": 2 },
+  "solidMap": [
+    0, 0, 1, 0,
+    0, 0, 1, 0
+  ],
+  "effectMap": [
+    0, 3, 1, 2,
+    0, 0, 1, 2
+  ],
+  "animatedMap": [
+    0, 0, 0, 0,
+    0, 0, 0, 0
+  ]
+}
